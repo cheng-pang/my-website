@@ -8,4 +8,6 @@ tags:
   - windows
 ---
 
+- 微PE+原版WIN系统iso
+
 - 注意MBR和GPT
