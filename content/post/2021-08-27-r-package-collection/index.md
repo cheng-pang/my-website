@@ -34,6 +34,12 @@ tags:
   
 - ggmap包
 
+- tmap包
+
+  - 用途：画地图
+  
+  - 详细介绍：<https://mp.weixin.qq.com/s/B85LEkO84xcNapI35Owcig>
+
 ## Model 数据建模相关
 
 ## Communicate 写作交流相关
