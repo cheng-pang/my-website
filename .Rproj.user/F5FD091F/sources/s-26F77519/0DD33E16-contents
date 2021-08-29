@@ -1,0 +1,5818 @@
+install.packages('rmarkdown')
+
+
+
+install.packages("installr")
+library(installr)
+updateR()
+#以上3行，用于在Rstudio中升级R语言版本#
+#更新包
+
+###############################
+#拿到一个数据集时的处理流程
+#1.head()函数查看数据集的头部长什么样
+#2.attributes(iris)函数查看数据集的属性类型，为下一步选择合适的可用函数
+#2.1首先要分清楚存储的方式是matrix、list还是data.frame，不用光看样子判断
+#3.计算前尽量先分配内存，估算不出来就先存在list内，最后do.call批量合并#split和do.call功能相反
+#4.分清长形数据框和宽形数据框：
+##4.1长形数据框=单一的观测有多个值出现但都是单独的一行
+##4.2宽形数据框=一个给定的观测值多次出现都在同一行
+#5.merge函数所有表现均为natural join下的innerjoin、leftjoin和rightjoin
+##5.1 intersect表现是SQL意义的innerjoin
+##5.2 R通过%in%表现SQL层面的leftjoin和rightjoin
+#####################################################
+#
+#R语言之书：编程与统计 The Book Of R: A First Course in Programming and Statistics
+#Tilman M.Davies著
+#ISBN 978-7-115-50189-9
+#庞成批注：这么书最适合入门
+####################################################
+
+#########################################
+# 第一部分 语言
+# 第1章 新手入门
+## 1.2打开R之初体验
+options(prompt = "R> ") #设置提示符为R>
+1034*28 #这是注释
+### 1.2.3 工作路径
+getwd() #这是工作路径 setwd("/folder1/folder2/")用于更改工作路径
+### 1.2.4 安装和加载R包
+install.packages('ks')
+update.packages() #这样是默认库内所有的包都更新，还得按Y
+library("MASS") #这是读取库文件
+### 1.2.5 帮助文件和函数文档
+?mean #这是说明书命令
+??"mean" #这是搜索帮助文档
+
+## 1.4 约定
+### 1.4.1 编码
+14/6
+
+for(myitem in 5:7){
+  cat("-- BRACED AREA BEGINS--\n")
+  cat("the current item is", myitem, "\n")
+  cat("-- BRACED AREA ENDS--\n\n")
+} #这是一个循环语句
+
+ordfac.vec <- factor(x=c("Small","Large","Large","Regular","Small"),
+                     levels =c("Small","Regular","Large"),                      
+                     ordered = TRUE)
+
+# 2 数值、运算、赋值和向量
+## 2.1 R在基础数学上的应用
+### 2.1.1 运算
+2^3 #幂运算
+sqrt(x=9) #平方根运算
+
+### 2.1.2 对数和指数
+log(x=243,base=3) #对数运算=5，因3^5=243,不写base值则默认base值为e
+exp(x=3) #自然对数（即指数）运算=20.08554，因e^3=20.08554
+log(20.08554)
+
+## 2.1.3 科学计数法
+2342151012900
+0.0000002533
+
+####练习2.1
+(6*(a=2.3)+42)/(3^(4.2-3.62)) 
+(-4)^2+2
+sqrt((25.2+15+16.44+15.3+18.6)/5/2)
+log(x=0.3)
+exp(x=-1.203973)
+-0.00000000423546322
+
+#2.2 分配对象
+x <- -5 # xX大小写敏感！
+x
+x = x +1 #这会覆盖上一个x值
+x
+mynumber = 45.2
+y <- mynumber*x
+y
+
+ls() #查询赋值对象，查询赋值项。很重要：意味着可以赋值到另一个对象，然后整体提取
+
+#### 练习2.2
+x <- (3^2)*(4^(1/8)) 
+x = x / 2.33
+x
+xm <- (-8.2)*(10^(-13))
+x*xm
+
+## 2.3 向量vector
+myvec <- c(1,3,1,42)
+myvec #以上3行，显示向量myvec内4个子值
+foo <- 32.1
+myvec2 <- c(3,-3,2,3.45,1e+03,64^0.5,2+(3-1.1)/9.44,foo)
+myvec2 #以上3行，显示结果说明1.所有数字会保留7位；2.科学计数法可直接用；3.，号分隔每个子值
+myvec3 <- c(myvec,myvec2)
+myvec3 #以上2行，合并向量，形成新的向量
+3:27 #以上1行，创建间隔为1的等差递增向量
+foo <- 5.3
+bar <- foo:(-47+1.5)
+bar #以上3行，创建从5.3开始，逐项减1，直到-45.5的等差递减向量
+seq(from=3,to=27,by=3) #以上1行，创建从3开始，逐项加3，直到27的等差递增向量
+seq(from=3,to=27,length.out = 40) #以上1行，创建从3开始直到27的,40个等间隔的向量
+
+foo <- 5.3
+myseq <- seq(from=foo,to=(-47+1.5),by=-2.4)
+myseq
+#以上3行，演示递减序列
+
+myseq2 <- seq(from=foo,to=(-47+1.5),length.out=5)
+myseq2
+#以上2行，演示递减序列，自动创建5个值
+
+rep(x=1,times=4) #以上1行，x=1重复4次的向量合集
+rep(x=c(3,62,8.3),times=3)
+rep(x=c(3,62,8.3),each=3) #以上2行，向量内值是相同的但排序不同
+rep(x=c(3,62,8.3),times=3,each=2) #以上1行，注意：先each后times
+
+foo <- 4
+c(3,8.3,rep(x=32,times=foo),seq(from=-2,to=1,length.out=foo+1))
+#以上2行，展示rep和seq都可以直接包含在相同数据类型的向量中
+
+sort(x=c(2.5,-1,-10,3.44),decreasing = FALSE) #以上1行，升序排列，同时小数点后2位是跟随向量内小数点
+
+sort(x=c(2.5,-1,-10,3.44),decreasing=TRUE)
+
+foo <- seq(from=4.3,to=5.5,length.out=8)
+foo
+bar <- sort(x=foo,decreasing=TRUE)
+bar
+
+sort(x=c(foo,bar),decreasing=FALSE)
+
+length(x=c(3,2,8,1)) #以上1行，测量返回向量内值的个数
+length(x=5:13)
+
+foo <- 4
+bar <- c(3,8.3,rep(x=32,times=foo),seq(from=-2,to=1,length.out=foo+1))
+length(x=bar)
+
+####练习2.3
+myvec <- seq(from=5,to=-11,by=-0.3)
+myvec
+myvec <- sort(x = myvec,decreasing = FALSE)
+myvec
+myvec2 <- sort(x =rep(c(-1,3,-5,7,-9),times=2,each=10),decreasing = FALSE)
+myvec2
+myvec3 <- c(seq(from=6,to=12,by=1),rep(x=5.3,times=3),-3,seq(from=102,to=length(x=myvec2),length.out = 9))
+myvec3
+length(x=myvec3)
+
+### 2.3.3子集和元素的提取
+myvec <- c(5,-2.3,4,4,4,6,8,10,40221,-8)
+length(x=myvec)
+myvec[2]
+myvec[length(x=myvec)-1]#以上4行，[]可提取向量内某个子集
+myvec.len <- length(x=myvec)
+1:myvec.len #以上2行，等差序列
+myvec[-1]#以上1行，-1可删除向量内第1个元素
+myvec[-2]#以上1行，-2可删除向量内第2个元素
+qux <- myvec[-(myvec.len-1)]
+qux#以上2行，删除了向量内第9个元素，再将新向量赋值给qux
+
+c(qux[-length(x=qux)],bar,qux[length(x=qux)])
+#以上1行，通过qux和bar重构myvec
+
+length(x=qux)
+qux[-length(x=qux)]
+
+bar <- myvec[myvec.len-1]
+bar
+
+#
+
+qux[length(x=qux)]
+
+#
+
+myvec[c(1,3,5)]#以上1行，[]和C提取了向量内3个元素
+
+
+1:4
+foo <- myvec[1:4]
+foo
+#以上3行，提取了myvec的1-4号元素
+
+length(x=foo):2
+foo[length(foo):2]
+#以上3行，提取了foo的4-2号元素
+
+indexes <- c(4,rep(x=2,times=3),1,1,2,3:1)
+indexes
+foo[indexes]
+#以上3行，利用rep重复提取某一元素
+
+foo[-c(1,3)]
+#以上1行，直接删除了1和3号元素形成新向量
+
+bar <- c(3,2,4,4,1,2,4,1,0,0,5)
+bar
+bar[1] <- 6
+bar #以上4行，[]可替换向量内第1个元素为6
+bar[c(2,4,6)] <- c(-2,-0.5,-1)
+bar #以上2行，[]内一次性替换了向量内第2,4,6号元素为-2,-0.5,-1
+bar[7:10] <- 100
+bar #以上2行，[]内seq一次性替换了向量内第7-10号元素为100
+
+#### 练习2.4
+myvec <- c(seq(from=3,to=6,length.out = 5),
+           rep(x=c(2,-5.1,-33),times=2),(7/42+2)) 
+myvec
+bar <- myvec[c(1,length(myvec))]
+foo <- myvec[-c(1,length(myvec))] 
+foo
+myvec1 <- c(bar[1],foo,bar[length(bar)])
+myvec1
+myvec <- sort(x=myvec1,decreasing = FALSE)
+myvec
+myvec2 <- myvec[length(myvec):1]
+myvec2
+myvec_g <- c(rep(x=foo[4],times=3),rep(x=foo[6],times=4),
+             foo[length(x=foo)])
+myvec_g
+myvec_h <- myvec
+myvec_h
+myvec_h[c(1,5,7,length(x=myvec_h))] <- 99:95
+myvec_h #这个练习H有歧义，这是理解1的做法
+myvec_h <- myvec
+myvec_h
+myvec_h <- c(99:95,myvec_h[-1])
+myvec_h
+myvec_h <- c(myvec_h[1:(length(x=99:95)+3)],99:95,
+             myvec_h[-(1:(length(x=99:95)+4))])
+myvec_h
+myvec_h <- c(myvec_h[1:(length(x=99:95)*2+4)],99:95,
+             myvec_h[-(1:(length(x=99:95)*2+5))])
+myvec_h
+myvec_h <- c(myvec_h[-length(myvec_h)],99:95)
+myvec_h #这个练习H有歧义，这是理解2的做法
+
+### 2.3.4面向向量的操作
+foo <- 5.5:0.5
+foo
+foo-c(2,4,6,8,10,12)
+#以上3行，演示依次相减
+
+bar <- c(1,-1)
+foo*bar
+#以上2行，演示交替相乘
+
+baz <- c(1,-1,0.5,-0.5)
+foo*baz
+#以上2行，展示不对称的相乘
+
+qux <- 3
+foo+qux
+#以上2行，展示依次相加
+
+foo
+sum(foo) #以上2行，对foo向量进行的求和
+prod(foo)#以上1行，对foo向量进行的连乘积
+
+foo
+foo[c(1,3,5,6)] <- c(-99,99)
+foo
+#以上3行，展示依次替换
+
+#### 练习2.5
+myvec_a <- c(2,0.5,1,2,0.5,1,2,0.5,1)/c(2,0.5,1) 
+prod(myvec_a)
+myvec_b1 <- c(45,77,20,19,101,120,212)
+myvec_b2 <- c(5/9*(myvec_b1-32))
+myvec_b2
+myvec_c1 <- c(2,4,6)
+myvec_c2 <- c(1,2)
+myvec_c3 <- rep(x=myvec_c2,each=3)*myvec_c1
+myvec_c3
+myvec_d1 <- myvec_c3
+myvec_d1[2:5] <- c(-0.1,-100)
+myvec_d1
+
+# 3 矩阵和数组 
+## 3.1定义一个矩阵
+A <- matrix(data = c(-3,2,893,0.17),nrow = 2, ncol=2) 
+A #以上2行，定义了一个2*2的矩阵，注意默认填充数字是竖着先列填充的
+
+### 3.1.1 填充方式
+matrix(data = c(1,2,3,4,5,6), nrow = 2,ncol = 3,byrow = FALSE)
+matrix(data = c(1,2,3,4,5,6), nrow = 2,ncol = 3,byrow = TRUE)
+#以上2行，定义了一个2*3的矩阵，通过byrow改变了填充方式
+
+### 3.1.2 合并行和列
+rbind(1:3,4:6)
+cbind(1:3,4:6)
+cbind(c(1,4),c(2,5),c(3,6)) #以上3行，合并向量形成矩阵
+
+### 3.1.3 矩阵的维度
+mymat <- rbind(c(1,3,4),5:3,c(100,20,90),11:13)
+mymat
+dim(mymat)
+nrow(mymat)
+ncol(mymat)
+dim(mymat)[2] #以上6行，查看矩阵行或列维度的方法dim先返回行数再列数
+
+## 3.2 构造子集
+A <- matrix(data = c(0.3,4.5,55.3,91,0.1,105.5,-4.2,8.2,27.9),nrow = 3, ncol=3) 
+A
+A[3,2] #以上3行，提取了元素，先行后列
+
+### 3.2.1 按行、列和对角线提前元素
+A[,2] #以上1行，提取了第2列
+A[1,] #以上1行，提取了第1行
+A[,c(3,1)] #以上1行，提取了3、1列
+A[c(3,1),2:3] 
+#以上1行，提取了3行2元素、1行2元素、3行3元素、1行3元素形成新的矩阵
+diag(x=A) #以上1行，提取了A矩阵对角线的3个元素
+
+### 3.2.2 省略和改写
+A[,-2] #以上1行，删除第二列元素
+A[-1,3:2] #以上1行，先删除第1行再依次提取3、2列
+A[-1,-2] #以上1行，删除第一行和第二列元素
+A[-1,-c(2,3)] #以上1行，先删除第1行,再依次删除3、2列，注意返回的是向量了
+B <- A
+B[c(1,3),2] <-900
+B #以上3行，将矩阵B的1行2列和3行2列元素替换为900
+
+B[,3] <- B[3,]
+B
+#以上2行，用矩阵B的第三行元素替代B的第三列元素
+
+B[c(1,3),c(1,3)] <- c(-7,7)
+B
+#以上2行，利用R中向量的-7和7依次替换B中元素
+
+B[c(1,3),2:1] <- c(65,-65,88,-88)
+B
+#以上2行，利用R中向量的依次替换B中元素
+
+diag(x=B) <- rep(x=0,times=3)
+B 
+#以上2行，直接替换对角线元素
+
+#########
+#练习3.1#
+#########
+myvec_a <-matrix(data= c(4.3,3.1,8.2,8.2,3.2,0.9,1.6,6.5), nrow = 4, ncol = 2)
+myvec_a
+myvec_b <- myvec_a[-1,]
+myvec_b
+myvec_c <- sort(x=myvec_a[,2],decreasing = FALSE)
+myvec_c <- cbind(myvec_a[,1],myvec_c)
+myvec_c
+#(d)
+myvec_d <-matrix(data=myvec_c[-4,-1])
+myvec_d
+myvec_e <- matrix(data=myvec_c[,2],nrow = 2,ncol = 2)
+myvec_e
+myvec_c[c(4,2),c(2,1)] <- diag(myvec_e)*(-1/2)
+myvec_f <- myvec_c
+myvec_f
+#######################
+## 3.3矩阵运算和线性代数#
+#######################
+### 3.3.1 矩阵的转置
+A <- rbind(c(2,5,2),c(6,1,4))
+A
+t(A)#矩阵转置
+t(t(A))
+
+### 3.3.2 单位矩阵
+A <- diag(x=3)
+A
+#以上2行，直接生产单位矩阵
+
+### 3.3.3 矩阵的数乘
+A <- rbind(c(2,5,2),c(6,1,4))
+a <- 2
+a*A
+#以上3行，展示数乘的标准运算，即依次相乘#
+
+### 3.3.4 矩阵的加减法
+A <- cbind(c(2,5,2),c(6,1,4))
+A
+B <- cbind(c(-2,3,6),c(8.1,8.2,-9.8))
+B
+A-B
+#以上5行，展示矩阵的标准加减法，即相应位置直接相互加减
+
+## 3.3.5 矩阵的乘法
+A <- rbind(c(2,5,2),c(6,1,4))
+dim(A)
+B <- cbind(c(3,-1,1),c(-3,1,5))
+dim(B)
+#以上4行，首先要保证行列的相互一致，才可以进行运算
+A%*%B
+B%*%A
+#以上2行，展示矩阵相乘前后位置的结果是不相同的
+
+## 3.3.6 逆矩阵
+A <- matrix(data=c(3,4,1,2),nrow=2,ncol=2)
+A
+solve(A)
+#以上3行，展示逆矩阵的算法
+A%*%solve(A)
+#以上1行，展示验证逆矩阵是否结果为单位矩阵
+
+#########
+## 练习3.2 ##
+#########
+#(a)
+2/7*(cbind(c(1,2,7),c(2,4,6))-cbind(c(10,30,50),c(20,40,60)))
+#(b)
+A <- matrix(data=c(1,2,7))
+B <- matrix(data=c(3,4,8))
+##(i) Not possible
+##(ii)
+t(A)%*%B
+##(iii)
+t(B)%*%(A%*%t(A))
+##(iv) Not possible
+##(v)
+solve(B%*%t(B)+A%*%t(A)-100*diag(3))
+#(c)
+A <- rbind(c(2,0,0,0),c(0,3,0,0),c(0,0,5,0),c(0,0,0,-1))
+solve(A)%*%A-diag(4)
+
+#######################
+## 3.4 多维数组#
+#######################
+### 3.4.1 定义
+AR <- array(data=1:24,dim=c(3,4,2))
+AR
+#以上2行，展示多维数组的行、列、层
+
+BR <- array(data=rep(x=1:24,times=3),dim=c(3,4,2,3))
+BR
+#以上2行，展示4维数组array行、列、层、块
+
+## 3.4.2 子集、提取和替换
+AR[2,,2]
+#以上1行，提取AR的第二层第二行的所有元素
+AR[2,c(3,1),2]
+#以上1行，提取AR的第二层第二行的特定1、3元素
+AR[1,,]
+#以上1行，提取AR中每一层的第一行形成矩阵
+BR[2,1,1,3]
+#以上1行，提取BR中第3块第一层向量中第二行第一列的元素
+BR[1,,,1]
+#以上1行，提取BR中第一块第一行的所有元素形成矩阵
+BR[,,2,]
+#以上1行，提取BR中第二层所有值，形成3个矩阵
+BR[3:2,4,,]
+#
+BR[2,,1,]
+#########
+## 练习 3.3 ##
+#########
+#(a)
+AR <- array(data=seq(from=4.8,to=0.1,length.out=48),dim=c(4,2,6))
+AR
+#(b)
+BR <- AR[c(4,1),2,]
+BR
+#(c)
+CR <- array(data=rep(x=BR[2,],times=4),dim=c(2,2,2,3))
+CR
+#(d)
+DR <- AR[,,-6]
+DR
+#(e)
+DR[c(2,4),2,c(1,3,5)] <- -99
+DR
+
+#######################
+# 4 非数值型数据
+## 4.1 逻辑值#
+#######################
+foo <- TRUE
+foo
+bar <- F
+bar #以上4行，F直接代表了FALSE
+baz <- c(T,F,F,F,T,F,T,T,T,F,T,F)
+baz
+length(x=baz) #以上3行，形成一个逻辑值的向量
+
+qux <- matrix(data=baz,nrow=3,ncol=4,byrow=foo)
+qux
+#以上2行，演示用逻辑值组成矩阵
+
+### 4.1.2 逻辑值的输出：关系运算符
+1==2 # == 相等
+1!=(2+3) # != 不相等
+1>=2 # >= 大于或等于
+(2-1)<=2 # <= 小于或等于 以上4行，关系运算符
+foo <- c(3,2,1,4,1,2,1,-1,0,3)
+bar <- c(4,1,2,1,1,0,0,3,0,4)
+length(x=foo) == length(x=bar) #以上3行，比较2个向量中的元素个数是否相等
+foo == bar #以上1行，比较2个向量中每对元素的逻辑值
+foo<bar
+foo<=bar
+foo<=(bar+10)
+
+baz <- foo[c(10,3)]
+baz
+foo>baz
+#以上3行，展示逻辑值也可以向量循环
+foo<3
+#以上1行，展示逻辑值也可以向量循环
+
+foo.mat <- matrix(foo,nrow=5,ncol=2)
+foo.mat
+bar.mat <- matrix(bar,nrow=5,ncol=2)
+bar.mat
+foo.mat<=bar.mat
+foo.mat<3
+#以上6行，展示逻辑值也可以进行矩阵比较
+
+qux <- foo == bar
+qux
+any(qux) #以上3行，至少一个逻辑值为TRUE，any返回TRUE
+all(qux) #以上1行，所有逻辑值为TRUE，any返回TRUE，否则FALSE
+#######################
+#练习4.1#
+#######################
+myvec_a <- c(6,9,7,3,6,7,9,6,3,6,6,7,1,9,1)
+myvec_a == 6
+myvec_a >= 6
+myvec_a <= (6+2)
+myvec_a != 6
+myvec_b <- myvec_a[-(1:3)]
+myvec_b2 <- array(data = myvec_b, dim = c(2,2,3))
+myvec_b2
+myvec_b2 <= (6/2+4)
+myvec_b3 <- (myvec_b2+2) <= (6/2+4)
+all(myvec_b3)
+#######################
+### 4.1.3 多重比较：逻辑运算符
+#######################
+FALSE||((T&&TRUE)||FALSE) 
+!TRUE&&TRUE
+(T&&(TRUE||F))&&FALSE
+(6<4)||(3!=1)
+#以上4行，展示元素比较&,|,!,以及单值比较&&,||
+
+foo <- c(T,F,F,F,T,F,T,T,T,F,T,F)
+foo
+bar <- c(F,T,F,T,F,F,F,F,T,T,T,T)
+bar
+foo & bar #以上5行，foo和bar中每个元素比较，所以返回and逻辑的向量集
+foo | bar #以上1行，foo和bar中每个元素比较，所以返回or逻辑的向量集
+foo && bar #以上1行，foo和bar中仅比较第1对元素，返回and逻辑的元素
+foo || bar#以上1行，foo和bar中仅比较第1对元素，返回or逻辑的元素
+!T && TRUE #以上1行，!为NOT非
+#######################
+#练习4.2#
+#######################
+foo <- c(7,1,7,10,5,9,10,3,10,8)
+foo
+(foo>5)|(foo==2)
+bar <- c(8,8,4,4,5,1,5,6,6,8)
+(bar <=6) & (bar != 4)
+((foo>5)|(foo==2)) & ((bar <=6) & (bar != 4))
+baz <- (foo + bar)
+(baz >= 14) & (baz!=15)
+myvec_d <- baz/foo
+myvec_d
+(myvec_d >4) | (myvec_d <=2)
+(myvec_d >4) || (myvec_d <=2)
+#######################
+### 4.1.4逻辑值也是数值
+#######################
+TRUE+TRUE #以上1行，TRUE是1，FALSE是0
+F-T #以上1行，结果为-1
+1||1 #以上1行，返回为逻辑值TRUE
+0&&1 #以上1行，返回为逻辑值FALSE
+
+### 4.1.5利用逻辑值提取子集
+myvec <- c(5,-2.3,4,4,4,6,8,10,40221,-8)
+myvec[c(F,T,F,F,F,F,F,F,F,T)]
+#以上1行，效果同myvec[c(2,10)]
+myvec<0
+myvec[myvec<0] #以上3行，利用逻辑值提取了TRUE的元素
+myvec[c(T,F)] #以上1行，循环提取了TRUE的元素
+myvec[(myvec>0)&(myvec<1000)]#以上1行，利用关系和逻辑符执行复杂提取
+myvec[myvec<0] <- -200
+myvec #以上2行，利用逻辑来索引替换了原值
+which(x=c(T,F,F,T,T)) #以上1行，返回TRUE位置索引值，和dim功能一样
+which(x=myvec<0) #以上1行，返回满足条件的TRUE位置索引值
+
+myvec[-which(x=myvec<0)]
+#以上1行，展示myvec[which(x=myvec<0)]代码是多余的，可直接写为myvec[myvec<0]，但-负值可which删除特定值
+
+A <- matrix(c(0.3,4.5,55.3,91,0.1,105.5,-4.2,8.2,27.9),nrow=3,ncol=3)
+A
+A[c(T,F,F),c(F,T,T)]
+#以上3行，展示效果同A[c(1,2:3)]
+
+A<1
+A[A<1] <- -7
+A
+#以上3行，展示利用逻辑值去替代某个元素
+
+A>25
+which(x=A>25)
+#以上2行，展示逻辑值去获取位置，但注意返回值是向量
+
+which(x=c(A[,1],A[,2],A[,3])>25)
+#以上1行，展示比上一列更清晰的索引方式，虽然值相同
+
+which(x=A>25,arr.ind=T)
+#以上1行，获取值的绝对位置信息，而不是上两行的相对位置信息
+
+#######################
+#练习4.3#
+#######################
+foo <- c(7,5,6,1,2,10,8,3,8,2)
+foo
+bar <- foo[foo>=5]
+bar
+foo[-which(x=foo>=5)]
+baz <- matrix(data = bar, nrow = 2,ncol = 3, byrow = TRUE)
+baz
+baz[baz==8] <- sqrt(x=baz[1,2])
+baz
+which(x= (baz<=25&baz>=4),arr.ind = FALSE)
+qux <- array(data=c(10,5,1,4,7,4,3,3,1,3,4,3,1,7,8,3,7,3),dim = c(3,2,3))
+qux
+which(x=qux==3|qux==4,arr.ind = TRUE)
+qux[qux<3|qux>=7]<- 100
+qux
+foo
+foo <- foo[c(F,T)]
+foo
+foo <- foo[c(0,1)]
+
+#######################
+## 4.2 字符
+#######################
+### 4.2.1 创建一个字符串
+foo <- "This is a character string!"
+foo #以上2行，录入一个扩展正则表达式文本
+length(x=foo) #以上1行，文本长度为1
+nchar(x=foo) #以上1行，字符合计27个
+bar <- "23.3"
+bar #以上2行，将数值存为文本
+
+bar * 2 
+# 以上1行，展示字符无法与数值相运算
+
+length(x=bar) #以上1行，文本长度为1
+nchar(x=bar) #以上1行，字符合计4个，含.
+"ALPHA"=="ALPHA"
+"ALPHA"=="alpha"  #以上2行，检验文本是否相等
+c("alpha","beta","gamma")=="beta" #以上1行，检验集合内是否相等
+"alpha"<="beta"
+"gamma">"Alpha"
+"Alpha">"alpha"
+"beta">="bEtA" #以上4行，检验中：后面的字母>前面的字母，大写字母>小写字母
+
+### 4.2.2 连接
+qux <- c("awesome","R","is")
+length(x=qux)
+qux
+cat(qux[2],qux[3],"totally",qux[1],"!")
+paste(qux[2],qux[3],"totally",qux[1],"!") #以上5行代码，说明concatenate仅是串联字符，并未形成新的R语言对象，但paste是形成一个新对象
+
+cat(qux[2],qux[3],"totally",qux[1],"!",sep="---")
+paste(qux[2],qux[3],"totally",qux[1],"!",sep="") #以上2行代码，说明sep分隔符Separator参数的用法
+cat("Do you think ",qux[2]," ",qux[3]," ",qux[1],"?",sep = "") #以上1行代码，手动插入分隔符
+a <-3
+b <-4.4
+paste("Is ",a+b," less than 10? That's totally ",a+b<10,".",sep = "")#以上3行代码，说明可将算术值与逻辑比较值输出成为字符串
+
+### 4.2.3 转义序列
+?Quotes #以上1行，得到完整转义列表
+cat("here is a string\nsplit\tto neww\b \n\n\tlines") #以上1行，演示转义序列
+cat("I really want a backslash: \\\nand a double quote: \"") #以上1行，演示转义序列
+
+#######################
+### 4.2.4 字符的子集与匹配
+#######################
+foo <- "This is a character string!"
+foo
+substr(x=foo,start=21,stop=27) #以上3行，截取子集
+substr(x=foo,start=1,stop=4) <- "Here"
+foo #以上2行，替换原有字符，但这种方法必须字符串长度相等！
+bar <- "How much wood could a woodchuck chuck"
+sub(pattern = "chuck",replacement = "hurl",x=bar)
+gsub(pattern = "chuck",replacement = "hurl",x=bar) #以上3行，搜索替换字符的2种方式
+?substr#更多搜索替换功能见
+?sub#更多搜索替换功能见
+#######################
+#练习4.4#
+#######################
+cat("\"The quick brown fox\n\tjumped over\n\t\t the lazy dogs\"") #说明转义字符仅能在cat中使用，paste中不可用！
+num1 <- 4
+num2 <- 0.75
+paste("The result of multiplying",num1,"by",num2,"is",num1*num2)
+sub(pattern="tdavies",replacement="pang",x="/Users/tdavies/Documents/RBook")
+bar <- "How much wood could a woodchuck chuck"
+bar
+myvec_d<-paste(bar,"if a woodchuck could chuck wood")
+gsub(pattern = "wood", replacement = "metal", x=myvec_d)
+myvec_e <- "Two 6-packs for $16.99"
+myvec_e
+substr(x=myvec_e,start=5,stop = 10) == "6-pack"
+substr(x=myvec_e,start=19,stop = 19) <- "0"
+myvec_e
+#######################
+## 4.3 因子factor（分类变量）
+#######################
+### 4.3.1 识别类别
+firstname <- c("Liz","Jolene","Susan","Boris","Rochelle","Tim","Simon","Amy")
+sex.num <- c(0,0,0,1,0,1,1,0)
+sex.char <- c("female","female","female","male","female","male","male","female")
+sex.num.fac <- factor(x=sex.num)
+sex.num.fac #以上5行，设定了0,1的分类变量
+sex.char.fac <- factor(x=sex.char)
+sex.char.fac #以上2行，设定了levels为female和male的分类变量
+levels(x=sex.char.fac)
+levels(x=sex.num.fac) #以上2行，查询了向量的水平值
+levels(x=sex.num.fac) <-c("1","2") 
+sex.num.fac#以上2行，用1和2替换了0和1,请注意1和2有引号，为字符非数值，虽然一开始0和1为数值
+sex.char.fac[c(1:3,5,8)] #以上1行，说明因子向量也可以提取子集，但水平值不会变
+firstname[sex.char.fac=="male"] #以上1行，通过male获得了所有男性的名字，请注意并没有关联firstname和sex.char.fac，仅是相对应位置即可筛选
+
+#######################
+#4.3.2 水平的定义与排序
+#######################
+mob <- c("Apr","Jan","Dec","Sep","Nov","Jul","Jul","Jun")
+mob[2]
+ms <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+mob.fac <- factor(x=mob,levels = ms,ordered = TRUE)
+mob.fac #以上5行，使用了factor和order形成了有序的分类向量
+mob[2]<mob[3]
+mob.fac[2]<mob.fac[3] #以上2行，说明了有序分类向量的可比性
+#######################
+#4.3.3 组合与分割
+#######################
+new.values <- factor(x=c("Oct","Feb","Feb"),levels = ms,ordered=TRUE)
+new.values
+c(mob.fac,new.values) #以上3行说明，c直接组合分类向量，仅能得到分类向量的位置索引值
+levels(mob.fac)[c(mob.fac,new.values)] #以上1行说明，必须重新赋值分类标签，才能得到分类向量
+mob.new <- levels(mob.fac)[c(mob.fac,new.values)]
+mob.new.fac <- factor(x=mob.new,levels = levels(mob.fac),ordered = TRUE)
+mob.new.fac #以上3行说明，赋值完分类后，还需要重新赋予有序性
+Y <- c(0.53,5.4,1.5,3.33,0.45,0.01,2,4.2,1.99,1.01)
+Y
+br <- c(0,2,4,6)
+cut(x=Y,breaks = br) #以上4行，利用cut函数形成分类向量，()为不包含，[]为包含
+cut(x=Y,breaks = br,right = FALSE) #以上1行，将前开后闭设置为前闭后开
+cut(x=Y,breaks = br,right = FALSE,include.lowest = TRUE) #以上1行，保证了最大值被包含在区间内
+lab <- c("Small","Medium","Large")
+cut(x=Y,breaks = br,right = FALSE,include.lowest = TRUE,labels=lab)#以上2行，给分类向量添加了标签
+#######################
+#练习4.5
+#######################
+myvec_a <- c(1:20)
+myvec_a[1:20] <- c("M")
+myvec_a[c(1,5:7,12,14:16)] <- c("F")
+myvec_a
+myvec_a1 <-c(1:20)
+myvec_a1[1:20] <- c("National")
+myvec_a1[c(1,4,12,15:16,19)] <- c("Labour")
+myvec_a1[c(6,9,11)] <- c("Greens")
+myvec_a1[c(10,20)] <- c("Other")
+myvec_a1
+myvec_a.char.fac <- factor(x=myvec_a)
+myvec_a.char.fac
+myvec_a2 <- c("National","Labour","Greens","Maori","Other")
+myvec_a1.char.fac <- factor(x=myvec_a1,levels = myvec_a2)
+myvec_a1.char.fac
+myvec_a1.char.fac[myvec_a.char.fac=="M"]
+myvec_a.char.fac[myvec_a1.char.fac=="National"]
+myvec_b <- c("M","M","F","F","F","M")
+myvec_b
+myvec_b.char.fac <- factor(x=myvec_b)
+myvec_c <- c(myvec_a.char.fac,myvec_b.char.fac)
+myvec_c
+myvec_c.new <-levels(myvec_a.char.fac)[myvec_c]
+myvec_c.new.fac <- factor(x=myvec_c.new,levels = levels(myvec_a.char.fac),ordered = FALSE)
+myvec_c.new.fac
+myvec_b1 <- c("National","Maori","Maori","Labour","Greens","Labour")
+myvec_b1
+myvec_b1.char.fac <- factor(x=myvec_b1,levels = levels(myvec_a1.char.fac))
+myvec_c1 <- c(myvec_a1.char.fac,myvec_b1.char.fac)
+myvec_c1
+myvec_c1.new <-levels(myvec_a1.char.fac)[myvec_c1]
+myvec_c1.new.fac <- factor(x=myvec_c1.new,levels = levels(myvec_a1.char.fac),ordered = FALSE)
+myvec_c1.new.fac
+myvec_d <- c(93,55,29,100,52,84,56,0,33,52,35,53,55,46,40,40,56,45,64,31,10,29,40,95,18,61)
+myvec_d
+myvec_d1 <- c(0,30,70,100)
+myvec_d2 <- cut(x=myvec_d,breaks = myvec_d1,right = TRUE,include.lowest = TRUE,labels=c("Low","Moderate","High"))
+myvec_d2
+myvec_d2[myvec_a1.char.fac=="Labour"]
+myvec_d2[myvec_a1.char.fac=="National"]
+
+#######################
+# 5列表和数据框
+#######################
+## 5.1 列表对象
+### 5.1.1 创建列表和访问组件
+foo <- list(matrix(data = 1:4,nrow=2,ncol=2),c(T,F,T,T),"hello")
+foo #以上2行，使用list创建列表
+length(x=foo) #以上1行，返回的是list中组件的个数
+foo[[3]] #以上1行，双中括号提取组件
+foo[[1]]+5.5
+foo[[1]][2,]
+cat(foo[[3]],"you!") #以上3行，演示组件视为独立对象
+foo[[3]]<- paste(foo[[3]],"you!")
+foo #以上2行，演示赋值操作来改写元素
+bar <- foo[c(2,3)]
+bar #以上2行，演示单中括号完成列表切片，筛选形成新的list
+
+### 5.1.2 命名
+names(foo) <- c("mymatrix","mylogicals","mystring")
+foo #以上2行，演示了给list中的元素命名，类似label
+foo$mymatrix #以上1行，演示了用names提取对象，代替了foo[[1]]
+all(foo$mymatrix[,2]==foo[[1]][,2]) #演示了等价的提取方法
+baz <- list(tom=c(foo[[2]],T,T,T,F),dick="g'day mate",harry=foo$mymatrix*2)
+baz #以上2行，演示了直接在list中进行names命名
+names(baz) #以上1行，演示用names查询标签
+
+### 5.1.3 嵌套
+baz$bobby <-foo
+baz
+baz$bobby$mylogicals[1:3]
+baz[[4]][[2]][1:3]
+baz[[4]]$mylogicals[1:3] #以上5行，说明list内可嵌套list，提供了3种不同的提取方式，但提取的结果是相同的
+#######################
+#练习5.1
+#######################
+myvec_a <-list(seq(from=-4,to=4,length.out = 20),
+               matrix(data=c(F,T,T,T,F,T,T,F,F),nrow=3,ncol=3),
+               c("don","quixote"),
+               factor(x=c("LOW","MED","MED","HIGH"),
+                      levels=c("LOW","MED","HIGH"),ordered = TRUE
+               ))
+myvec_a  #levels必须全小写
+c(myvec_a[[2]][2,2:3],myvec_a[[2]][1,])
+myvec_a[[3]] <- sub(pattern = "quixote", replacement = "Quixote", x=myvec_a[[3]])
+myvec_a[[3]] <- sub(pattern = "don", replacement = "Don", x=myvec_a[[3]])
+myvec_a[[3]]
+cat("\"Windmills! ATTACK!\"\n\t-\\",myvec_a[[3]][1]," ",myvec_a[[3]][2],"/-",sep="")
+myvec_a1 <- myvec_a[[1]][myvec_a[[1]]>1]
+myvec_a1
+which(x=myvec_a[[4]]=="MED") #文本中相等要有==
+myvec_b <- list(facs=myvec_a[[4]],nums=c(3,2.1,3.3,4,1.5,4.9),oldlist=myvec_a[1:3])
+myvec_b
+list(myvec_b$facs,myvec_b$nums[myvec_b$nums>=3])
+myvec_b$flags <- rep(x=myvec_b$oldlist[[2]][,3],2)
+myvec_b
+myvec_b$nums[myvec_b$flags!=TRUE]
+myvec_b$oldlist[[3]] <- paste(myvec_b$oldlist[[3]][1],myvec_b$oldlist[[3]][2])
+myvec_b$oldlist[[3]]
+#######################
+## 5.2数据框
+#######################
+### 5.2.1 创建数据框
+mydata <- data.frame(person=c("Peter","Lois","Meg","Chris","Stewie"),
+                     age=c(42,40,17,14,1),
+                     sex=factor(c("M","F","F","M","M")),                     
+                     stringsAsFactors = TRUE
+) #以上3行，演示了构建数据框
+mydata[[3]]
+mydata[2,2]
+mydata[[2]][2]
+mydata$age[2]#以上4行，说明数据框可以和list或matrix一样提取数据
+mydata[,c(3,1)] #以上1行，演示了调整列变量的顺序
+mydata$age #以上1行，演示了用$提取列数据
+nrow(mydata)
+ncol(mydata)
+dim(mydata) #以上3行，演示了data.frame与matrix相同的提取行列数据的方法
+mydata$person #以上1行，说明字符串向量在data.frame中默认为因子对象
+
+### 5.2.2 添加数据列并合并数据框
+newrecord <- data.frame(person="Brian",age=7,
+                        sex=factor("M",levels = levels(mydata$sex)))
+newrecord
+mydata <- rbind(mydata,newrecord)
+mydata #以上5行，演示了添加1行row观察值
+funny <- c("High","High","Low","Med","High","Med")
+funny <- factor(x=funny,levels = c("Low","Med","High"),ordered = TRUE)
+funny
+mydata <- cbind(mydata,funny)
+mydata #以上5行，演示了添加1个列变量
+mydata$age.mon <- mydata$age*12
+mydata #以上5行，演示了$符号直接加列，但以上这些都是在末尾添加，在中间添加的方法是直接构建新data.frame
+
+### 5.2.3 利用逻辑值提取记录的子集
+mydata$sex=="M"
+mydata[mydata$sex=="M",] #以上2行，演示了筛选data.frame的方法，注意“，”号是为了符合matrix相同的语法
+mydata[mydata$sex=="M",-3] #以上1行，与上1行的不同点在于删除了第3列的sex值
+mydata[mydata$sex=="M",c("person","age","funny","age.mon")] #以上1行，是上1行的正面做法
+mydata[mydata$age>10|mydata$funny=="High",] #以上1行，演示或条件下的筛选，注意“，”号是为了符合matrix相同的语法
+mydata[mydata$age>45,]
+nrow(mydata[mydata$age>45,])  #以上2行，演示筛选结果为空，与subset用法一直
+#######################
+#练习5.2
+#######################
+dframe <- data.frame(person=c("Stan","Francine","Steve","Roger","Haylay","Klaus"),
+                     sex=c("M","F","M","M","F","M"),
+                     funny=c("High","Med","Low","High","Med","Med"),
+                     stringsAsFactors = FALSE
+)
+dframe$sex <- factor(x=dframe$sex,levels = levels(x=mydata$sex))
+dframe$funny <- factor(x=dframe$funny,levels = levels(x=mydata$funny),ordered = TRUE)
+dframe
+age <- c(41,41,15,1600,21,60)
+dframe<- cbind(dframe,age)
+dframe
+dframe <-dframe[,c(1,4,2,3)]
+dframe #以上2行，演示直接用列位置索引改变排序
+mydata2 <- mydata[,-5]
+mydata2#以上2行，演示直接用列位置索引删除列变量
+mydataframe <- rbind(mydata2,dframe)
+mydataframe
+mydataframe[mydataframe$sex=="F" &(mydataframe$funny=="Med" | mydataframe$funny=="High"),
+            c("person","age")] #以上1行，演示了筛选并仅提取部分列
+mydataframe[substr(x=mydataframe$person,start=1,stop=1) =="S",]
+#######################
+#6 特殊值、类型和转换
+#######################
+## 6.1 特殊值
+### 6.1.1 无穷数
+foo <- Inf
+foo
+bar <-c(3401,Inf,3.1,-555,Inf,43)
+bar
+baz <- 90000^100
+baz
+qux <- c(-42,565,-Inf,-Inf,Inf,-45632.3)
+qux
+Inf*-9
+-59/Inf
+-59/-Inf
+-59/0
+59/0
+Inf/0
+is.infinite(x=qux)
+!is.finite(x=qux) #以上2行，展示如何检测无穷值
+-Inf<Inf
+qux==Inf
+
+### 6.1.2 NaN
+-Inf+Inf
+Inf/Inf
+0/0 #以上3行，展示NaN
+NaN + 1
+2+6*(4-4)/0
+3.5^(-Inf/Inf)
+
+bar <- c(NaN,54.3,-2,NaN,90094.123,-Inf,55)
+bar
+is.nan(x=bar)
+!is.nan(x=bar)
+bar[-(which(is.nan(x=bar)|is.infinite(x=bar)))] #以上1行，展示了用which与逻辑值删除观测值
+is.nan(x=bar)|is.infinite(x=bar)
+bar[-(which(is.nan(x=bar)|is.infinite(x=bar)))]
+
+#######################
+#练习6.1
+#######################
+foo <-c(13563,-14156,-14319,16981,12921,11979,9568,8833,-12968,8133)
+foo <-foo^75
+foo[which(is.finite(foo))]
+foo[foo!=-Inf]
+bar <- matrix(data = c(77875.4,-35466.25,-39803.81,27551.45,-73333.85,55976.34,23764.3,36599.69,76694.82,
+                       -36478.88,-70585.69,47032) ,nrow=3,ncol=4)
+bar
+which(is.nan(bar^65/Inf))
+which(is.nan(bar^65/Inf),arr.ind=T)
+bar[which(!is.nan(bar^67+Inf))]
+bar[which((bar^67)!=-Inf)]
+bar[which(!(bar^67==Inf|bar^67==-Inf))]
+#######################
+### 6.1.3 NA
+#######################
+foo <- c("character","a",NA,"with","string",NA)
+foo
+bar <- factor(c("blue",NA,NA,"blue","green","blue",NA,"red","red",NA,"green"))
+bar
+baz <- matrix(c(1:3,NA,5,6,NA,8,NA),nrow=3,ncol=3)
+baz
+
+qux <- c(NA,5.89,Inf,NA,9.43,-2.35,NaN,2.1,-8.53,-7.58,NA,-4.58,2.01,NaN)
+qux
+is.na(qux) #以上2行，演示了查询是否是缺失值，注意同时标注了NaN值
+which(x=is.nan(x=qux))
+which(x=(is.na(x=qux)&!is.nan(qux))) #以上2行，分别识别NaN和NA元素
+quux <- na.omit(object = qux)
+quux #以上2行，演示NaN和NA被删除形成新向量，且形成的是Object参数形式给出。
+76>NaN #以上1行，结果为NA，而不是NaN
+
+### 6.1.4 NULL
+foo <- NULL
+bar <- NA # 以上2行，展示NULL和NA的区别，NA建立了索引，而NULL则完全空白
+c(2,4,NA,8)
+c(2,4,NULL,8) #以上2行，演示了NULL作为空值
+c(NA,NA,NA)
+c(NULL,NULL,NULL)
+opt.arg <- c("string1","string2","string3")
+opt.arg
+is.na(opt.arg)
+is.null(opt.arg) #以上4行，演示了NULL在编程逻辑运算中的作用
+
+opt.arg <- c(NA,NA,NA)
+is.na(x=opt.arg)
+opt.arg <- c(NULL,NULL,NULL)
+is.null(x=opt.arg)
+#以上4行，展示NA和NULL的逻辑不同
+
+NULL+53
+53<=NULL
+NaN-NULL+NA/Inf
+#以上3行，展示NULL依据操作不同，得出的向量类型不同#
+
+foo <- list(member1=c(33,1,5.2,7),member2="NA or NULL?")
+foo
+foo$member3
+#以上3行，返回NULL，说明不存在foo$member3
+
+foo$member3 <- NA
+foo
+#以上2行，展示直接填写入随意值
+
+#######################
+#6.2练习
+#######################
+foo <- c(4.3,2.2,NULL,2.4,NaN,3.3,3.1,NULL,3.4,NA)
+foo
+length(foo) == 8
+which(x=is.na(x=foo)) == c(4,8)
+is.null(x=foo)
+is.na(x=foo[8])+4/NULL
+myvec_b <- list(c(7,7,NA,1,1,5,NA))
+names(myvec_b) <- "alpha"
+myvec_b
+is.null(myvec_b$beta)
+myvec_b$beta <- which(is.na(x=myvec_b$alpha))
+myvec_b
+#######################
+## 6.2类型、类别和转换
+#######################
+### 6.2.1 属性
+foo <- matrix(data=1:9,nrow = 3,ncol = 3)
+foo
+attributes(foo) #以上3行，演示了如何展示属性
+attr(x=foo,which = "dim")
+dim(foo)
+mode(foo) #以上1行，mode函数展示R对象的模式
+bar <- matrix(data = 1:9,nrow = 3,ncol = 3,dimnames = list(c("A","B","C"),c("D","E","F")))
+bar #以上2行，演示了重命名属性
+attributes(bar)
+dimnames(foo) <- list(c("A","B","C"),c("D","E","F"))
+foo 
+#######################
+### 6.2.2对象类别
+#######################
+num.vec1 <- 1:4
+num.vec1
+num.vec2 <- seq(from=1,to=4,length=6)
+num.vec2
+char.vec <- c("a","few","strings","here")
+char.vec
+logic.vec <- c(T,F,F,F,T,F,T,T)
+logic.vec
+fac.vec <- factor(c("Blue","Blue","Green","Red","Green","Yellow"))
+fac.vec
+class(num.vec1)
+class(num.vec2)
+class(char.vec)
+class(logic.vec)
+class(fac.vec) #以上15行，展示了不同类别的向量，class叫对象类别S3
+
+num.mat1 <- matrix(data=num.vec1,nrow=2,ncol=2)
+num.mat1
+num.mat2 <- matrix(data=num.vec2,nrow=2,ncol=3)
+num.mat2
+char.mat <- matrix(data=char.vec,nrow=2,ncol=2)
+char.mat
+logic.mat <- matrix(data=logic.vec,nrow=4,ncol=2)
+logic.mat
+
+class(num.mat1)
+class(num.mat2)
+class(char.mat)
+class(logic.mat)
+#以上13行，展示不同对象类别
+
+ordfac.vec <- factor(x=c("Small","Large","Large","Regular","Small"),levels=c("Small","Regular","Large"),ordered=TRUE)
+ordfac.vec
+class(ordfac.vec)
+mode(ordfac.vec)
+typeof(ordfac.vec)
+#以上5行，展示不同对象类别
+
+### 6.2.3 检查对象函数is.
+num.vec1 <- 1:4
+is.integer(num.vec1)
+is.numeric(num.vec1)
+is.matrix(num.vec1)
+is.data.frame(num.vec1)
+is.vector(num.vec1)
+is.logical(num.vec1) #以上6行，展示如何检验对象类型
+
+### 6.2.4 转换函数as.
+1:4+c(T,F,F,T)
+
+foo<- 34
+bar <- T
+paste("Definitely foo: ",foo,"; definitely bar: ",bar,".",sep="")
+
+as.numeric(c(T,F,F,T))
+1:4+as.numeric(c(T,F,F,T))
+foo <- 34
+foo.ch <- as.character(foo)
+foo.ch #以上4行，展示了数值和文本类型的转换
+bar <- T
+bar.ch <- as.character(bar)
+bar.ch
+paste("Definitely foo: ",foo.ch,"; definitely bar: ",bar.ch,".",sep="")
+
+as.numeric("32.4")
+#
+as.numeric("g'day mate")
+#以上1行，注意返回值
+
+as.logical(c("1","0","1","0","0"))
+as.logical(as.numeric(c("1","0","1","0","0"))) #以上2行，说明要转换成为逻辑类型，必须先为数值型
+baz <- factor(x=c("male","male","female","male"))
+baz
+as.numeric(baz) #以上3行，因子类型转换为数值类型，level默认1、2、3...
+
+qux <- factor(x=c(2,2,3,5))
+qux
+as.numeric(qux)
+#以上3行，展示因子向量的特殊性
+
+foo <- matrix(data=1:4,nrow=2,ncol=2)
+foo
+as.vector(foo)
+#以上3行，展示矩阵与向量的转换
+
+bar <- array(data=c(8,1,9,5,5,1,3,4,3,9,8,8),dim=c(2,3,2))
+bar
+as.matrix(bar)
+as.vector(bar)
+#以上4行，展示数组转换为矩阵或向量
+
+baz <- list(var1=foo,var2=c(T,F,T),var3=factor(x=c(2,3,4,4,2)))
+baz
+as.data.frame(baz)
+#
+qux <- list(var1=c(3,4,5,1),var2=c(T,F,T,T),var3=factor(x=c(4,4,2,1)))
+qux
+as.data.frame(qux)
+#以上7行，展示list转换为数据框时，由于变量长度不匹配引起的warning
+
+#######################
+#6.3练习
+#######################
+foo <- array(data = 1:36,dim = c(3,3,4))
+foo
+class(foo)
+attributes(foo)
+bar <- as.vector(foo)
+bar
+class(bar)
+attributes(bar)
+baz <- as.character(bar)
+baz
+class(baz)
+attributes(baz)
+qux <- as.factor(baz)
+qux
+class(qux)
+attributes(qux)
+quux <- bar+c(-0.1,0.1)
+quux
+class(quux)
+attributes(quux)
+myvec_a <- factor(x=c(is.numeric(foo)+is.integer(foo),
+                      is.numeric(bar)+is.integer(bar),
+                      is.numeric(baz)+is.integer(baz),
+                      is.numeric(qux)+is.integer(qux),
+                      is.numeric(quux)+is.integer(quux))
+)
+myvec_a
+as.numeric(myvec_a)
+myvec_b <- matrix(data = 2:13,ncol = 4,nrow = 3)
+myvec_b <- t(myvec_b)
+as.character(myvec_b)
+myvec_d <- matrix(data = c(34,23,33,42,41,0,1,1,0,0,1,2,1,1,2),ncol = 3,nrow = 5)
+as.data.frame(myvec_d)
+myvec_d[,2] <- as.logical(myvec_d[,2])
+myvec_d[,3] <- as.factor(myvec_d[,3])
+myvec_d[,3]
+
+#######################
+#7 基本绘图
+#######################
+## 7.1 使用plot调整坐标向量
+foo <- c(1.1,2,3.5,3.9,4.2)
+bar <- c(2,2.2,-1.3,0,0.2)
+plot(foo,bar) #以上3行，演示2个向量画散点图的基本方法
+
+baz <- cbind(foo,bar)
+baz #以上2行，演示矩阵matrix画图的基本方法
+plot(baz)
+
+## 7.2图形化参数
+### 7.2.1 自动绘图类型
+plot(foo,bar,type = "l") #以上1行，设置类型为“l” line
+### 7.2.2 标题和坐标轴标签
+plot(foo,bar,type = "p") #以上1行，设置类型为“p” point
+plot(foo,bar,type = "b") #以上1行，设置类型为“b” both
+plot(foo,bar,type = "o") #以上1行，设置类型为“o” Overlays
+plot(foo,bar,type = "n") #以上1行，设置类型为“n” null,用于复合复杂图形
+plot(foo,bar,type = "b",main = "My lovely plot",xlab="x axis label",ylab = "location y")
+plot(foo,bar,type = "b",main = "My lovely plot \ntitle on two lines",xlab="x axis label",ylab = "location y") #以上2行，演示转义符的使用
+
+### 7.2.3 颜色
+plot(foo,bar,type = "b",main = "My lovely plot",xlab="",ylab = "",col=2)
+
+plot(foo,bar,type = "b",main = "My lovely plot \ntitle on two lines",xlab="",ylab = "",col="seagreen4") #以上2行，演示转义符的使用
+### 7.2.4 点和线的外观
+### 7.2.5 绘图区域限制
+plot(foo,bar,type = "b",main = "My lovely plot \ntitle on two lines",xlab="",ylab = "",
+     col="seagreen4",xlim = c(-10,5),ylim = c(-3,3)) #以上2行，设置x轴和Y轴的作图范围
+plot(foo,bar,type = "b",main = "My lovely plot \ntitle on two lines",xlab="",ylab = "",
+     col="cyan",xlim = c(-10,5),ylim = c(-3,3),
+     pch=9, #pch范围[1,25]#
+     lty=4, #lty范围[1,6]#
+     cex=1.3,  #point的特征扩展，设置点的大小#
+     lwd=2.3 #line的width#
+) #以上7行，设置画图的各种特征
+
+## 7.3 在已有图中添加点、线和文本
+x <- 1:20
+y <- c(-1.49,3.37,2.59,-2.78,-3.94,-0.92,6.43,8.51,3.41,-8.23,-12.01,
+       -6.58,2.87,14.12,9.63,-4.58,-14.78,-11.67,1.17,15.62)
+plot(x,y,type="n",main = "") #以上3行，绘制了大的空白图表
+abline(h=c(-5,5),col="red",lty=2,lwd=2) #以上1行，h控制横向线，v控制纵向线，在空白图表中添加了分割线
+segments(x0=c(5,15),y0=c(-5,-5),x1=c(5,15),y1=c(5,5),col = "red",lty = 3,lwd = 2) #以上1行，画了4个点内的区域，不像abline会跨越整个区域
+points(x[y>=5],y[y>=5],pch=4,col="magenta",cex=2)
+points(x[y<=-5],y[y<=-5],pch=3,col="darkGREEN",cex=2)
+points(x[(x>=5&x<=15)&(y>-5&y<5)],y[(x>=5&x<=15)&(y>-5&y<5)],pch=19,col="Turquoise",cex=1)
+points(x[(x<5|x>15)&(y>-5&y<5)],y[(x<5|x>15)&(y>-5&y<5)],pch=1,cex=1.1) #以上4行，添加不同区域的点的形状
+lines(x,y,lty=4) #以上1行，添加线
+arrows(x0=8,y0=14,x1=11,y1=2.5) #以上1行，用起始和终末值画箭头
+text(x=8,y=15,labels = "sweet spot") #添加文字标签
+legend("bottomleft", #另可topright等，决定图例位置#
+       legend=c("overall process","sweet","standard","too big","too small",
+                "sweet y range","sweet x range"), #图例文字说明#
+       pch=c(NA,19,1,4,3,NA,NA),lty=c(4,NA,NA,NA,NA,2,3), #这2个参数在这个例子中p配对使用，保证线和点分开#
+       col=c("black","Turquoise","black","magenta","darkgreen","red","red"),
+       pt.cex = c(NA,1,1,2,2,NA,NA),lwd = c(1,NA,NA,NA,NA,2,2) #这2个参数在这个例子中p配对使用，保证线和点分开#
+)
+
+#######################
+#练习7.1
+#######################
+x <- -3:3
+y <- 7:13
+plot(x,y,type = "n",main = "",xlab="",ylab="")
+abline(h=c(7,13),v=c(-3,3),col="red",lty=2,lwd=2)
+arrows(x0=-2.5,y0=10,x1=-1,y1=10) #以上1行，用起始和终末值画箭头
+arrows(x0=2.5,y0=10,x1=1,y1=10) #以上1行，用起始和终末值画箭头
+arrows(x0=-2.5,y0=12.5,x1=-1,y1=10.5) #以上1行，用起始和终末值画箭头
+arrows(x0=-2.5,y0=7.5,x1=-1,y1=9.5) #以上1行，用起始和终末值画箭头
+arrows(x0=2.5,y0=12.5,x1=1,y1=10.5) #以上1行，用起始和终末值画箭头
+arrows(x0=2.5,y0=7.5,x1=1,y1=9.5) #以上1行，用起始和终末值画箭头
+text(x=0,y=10,labels = "SOMETHING\nPROFOUND") #添加文字标签
+
+x <- c(55,85,75,42,93,63,58,75,89,67)
+y <- c(161,185,174,154,188,178,170,167,181,178)
+plot(x,y,type = "n",main = "Height against weight for 10 people",xlab="weight (Kg)",ylab="height (cm)")
+points(x=c(55,42,58,67),y=c(161,154,170,178),pch=4,col="magenta",cex=2)
+points(x=c(85,75,93,63,75,89),y=c(185,174,188,178,167,181),pch=5,col="turquoise",cex=1)
+legend("topleft", #另可topright等，决定图例位置#
+       legend=c("female","male"), #图例文字说明#
+       pch=c(4,5),
+       col=c("magenta","Turquoise"),
+       pt.cex = c(2,1)
+)
+#######################
+## 7.4 ggplot2包
+#######################
+### 7.4.1 使用qplot进行快速绘图
+install.packages("ggplot2")
+
+library("ggplot2")
+foo <- c(1.1,2,3.5,3.9,4.2)
+bar <- c(2,2.2,-1.3,0,0.2)
+qplot(foo,bar)
+qplot(foo,bar,main = "My lovely qplot",xlab = "x axis label",ylab = "location y") #以上5行，演示qplot画图
+baz <- plot(foo,bar)
+baz
+qux <- qplot(foo,bar)
+qux #以上4行，演示plot和qplot的区别
+
+### 7.4.2 使用geoms设置外观常量
+library("ggplot2")
+qplot(foo,bar,geom="blank")+geom_point()+geom_line()
+qplot(foo,bar,geom="blank")+geom_point(size=3,shape=6,color="blue")+geom_line(color="red",linetype=2)
+#以上3行，展示了qplot设置点和线的类型
+myqplot <- qplot(foo,bar,geom="blank")+geom_line(color="red",linetype=2)
+myqplot + geom_point(size=3,shape=3,color="blue")
+myqplot + geom_point(size=3,shape=7,color="blue") #以上3行，展示了先保存为对象后，调用对象修改部分值的效果
+
+### 7.4.3 geoms的美学映射
+library("ggplot2")
+x <- 1:20
+y <- c(-1.49,3.37,2.59,-2.78,-3.94,-0.92,6.43,8.51,3.41,-8.23,-12.01,
+       -6.58,2.87,14.12,9.63,-4.58,-14.78,-11.67,1.17,15.62)
+ptype <- rep(NA,length(x=x))
+ptype[y>=5] <- "too_big"
+ptype[y<=-5] <- "too_small"
+ptype[(x>=5&x<=15)&(y>-5&y<5)] <- "sweet"
+ptype[(x<5|x>15)&(y>-5&y<5)] <- "standard"
+ptype <- factor(x=ptype) #这1行转换为分类对象
+ptype
+qplot(x,y,color=ptype,shape=ptype)+geom_point(size=4)+ #点的大小#
+  geom_line(mapping = aes(group=1),color="black",lty=2)+ #线的颜色和线型#
+  geom_hline(mapping = aes(yintercept=c(-5,5)),color="red")+ #分割通线的颜色#
+  geom_segment(mapping = aes(x=5,y=-5,xend=5,yend=5),color="red",lty=3)+ #线段的颜色和线型#
+  geom_segment(mapping = aes(x=15,y=-5,xend=15,yend=5),color="red",lty=3) #线段的颜色和线型#
+#以上15行，展示了先保存点matrix，转换为分类对象
+
+#######################
+#练习7.2
+#######################
+x <- c(55,85,75,42,93,63,58,75,89,67)
+y <- c(161,185,174,154,188,178,170,167,181,178)
+plot(x,y,type = "n",main = "Height against weight for 10 people",xlab="weight (Kg)",ylab="height (cm)")
+points(x=c(55,42,58,67),y=c(161,154,170,178),pch=4,col="magenta",cex=2)
+points(x=c(85,75,93,63,75,89),y=c(185,174,188,178,167,181),pch=5,col="turquoise",cex=1)
+legend("topleft", #另可topright等，决定图例位置#
+       legend=c("female","male"), #图例文字说明#
+       pch=c(4,5),
+       col=c("magenta","Turquoise"),
+       pt.cex = c(2,1)
+)
+
+library("ggplot2")
+w <- c(55,85,75,42,93,63,58,75,89,67)
+h <- c(161,185,174,154,188,178,170,167,181,178)
+sex <- factor(x=c("female","male","male","female",
+                  "male","male","female","male","male","female"))
+qplot(w,h,main="Height against weight for 10 people",xlab="Weight (Kg)",ylab="Height (cm)",
+      color=sex,shape=sex)+geom_point(size=4)
+
+#######################
+# 8读写文件
+#######################
+## 8.1 R内置数据集 
+data() #读入程序包的数据到R环境中
+
+### 8.1.1 内置数据集
+library(help="datasets")
+?ChickWeight
+ChickWeight[1:15,] #以上1行，选取部分数据的方式
+
+### 8.1.2 贡献数据集
+install.packages("tseries")
+library("tseries")
+library(help="tseries")
+data(ice.river)
+ice.river[1:5,] #以上5行，演示加载ice.river数据集中的前5行
+#######################
+## 8.2读入外部数据文件
+#######################
+### 8.2.1 表格格式
+mydatafile <- read.table(file = "E:/Users/pangcheng/Desktop/R语言/mydatafile.txt",
+                         header=TRUE,sep=" ",na.strings="*",
+                         stringsAsFactors=FALSE
+)
+mydatafile #以上5行，演示导入txt文档
+list.files("/Users/pangcheng") #以上1行，演示查看文件夹内所有文件
+file.choose() #以上1行，演示获取文件路径
+mydatafile <- read.table(file = file.choose(),
+                         header=TRUE,sep=" ",na.strings="*",
+                         stringsAsFactors=FALSE
+)
+mydatafile #以上5行，演示使用file.choose来直接选择文件
+mydatafile$sex <- as.factor(mydatafile$sex)
+mydatafile$funny <- factor(x=mydatafile$funny,levels=c("Low","Med","High"))
+mydatafile #以上3行，演示使用将文本转化为因子
+
+### 8.2.2 电子表格工作簿
+spread <- read.csv(file = "E:\\Users\\pangcheng\\Desktop\\R语言\\spreadsheetfile.csv",
+                   header=FALSE,
+                   stringsAsFactors=TRUE
+)
+spread #以上5行，演示导入CSV
+
+### 8.2.3 基于网页的文件
+dia.url <- "http://jse.amstat.org/v9n2/4Cdata.txt"
+diamonds <- read.table(dia.url)
+names(diamonds) <- c("Carat","Color","Clarity","Cert","Price")
+diamonds[1:5,] #以上4行，演示从网站获取文件
+
+### 8.2.4 其他文件格式
+#skip语句跳过数据文件顶部的某些额外信息行
+#读取其他文件的包详见其他书籍#
+#foreign包读取Stata、SAS、Minitab和SPSS的数据文件
+#RODBC包读取Access文件
+#RMySQL包读取
+#RJDBC包读取HIVE,hive是基于Hadoop的一个数据仓库工具
+#ROracle包读取
+#######################
+## 8.3写出数据文件和图形
+#######################
+### 8.3.1 数据集
+write.table(x=mydatafile,file="E:\\Users\\pangcheng\\Desktop\\R语言\\somenewfile.txt",
+            sep="@",na="??",quote=FALSE,row.names = FALSE
+) #以上3行，演示写出txt  
+
+### 8.3.2 图像和图形文件
+jpeg(filename = "E:\\Users\\pangcheng\\Desktop\\R语言\\myjpegplot.jpeg",
+     width = 600,height = 600
+)
+plot(1:5,6:10,ylab = "a nice ylab",xlab = "here's an xlab",
+     main = "a saved .jpeg plot")
+points(1:5,10:6,cex=2,pch=4,col=2)
+dev.off() #以上7行，演示另存为jpeg图片,长宽默认单位为像素，通过units改
+
+pdf(file = "E:\\Users\\pangcheng\\Desktop\\R语言\\mypdfplot.pdf",
+    width = 5,height = 5
+)
+plot(1:5,6:10,ylab = "a nice ylab",xlab = "here's an xlab",
+     main = "a saved .pdf plot")
+points(1:5,10:6,cex=2,pch=4,col=2)
+dev.off() #以上7行，演示另存为pdf图片,长宽默认单位为英尺
+postscript(file = "E:\\Users\\pangcheng\\Desktop\\R语言\\myepsplot.eps",
+           width = 5,height = 5
+)
+plot(1:5,6:10,ylab = "a nice ylab",xlab = "here's an xlab",
+     main = "a saved .eps plot")
+points(1:5,10:6,cex=2,pch=4,col=2)
+dev.off() #以上7行，演示另存为eps图片
+#R语言中生成的eps在latex中有时候会出现错误。解决方法:将原来的图片截图保留成jpg再通过http://www.tlhiv.org/rast2vec/将jpg文件转换成eps
+
+library(ggplot2)
+foo <- c(1.1,2,3.5,3.9,4.2)
+bar <- c(2,2.2,-1.3,0,0.2)
+qplot(foo,bar,geom = "blank") + 
+  geom_point(size=3,shape=8,color="turquoise") + 
+  geom_line(color="navyblue",linetype=4)
+ggsave(filename = "E:\\Users\\pangcheng\\Desktop\\R语言\\mypngplot.png")
+#以上7行，演示另存为png图片,其他参数见?ggsave帮助文件
+
+## 8.4 特殊对象的读/写操作
+somelist <- list(foo=c(5,2,45),
+                 bar=matrix(data=c(T,T,F,F,F,F,T,F,T),nrow = 3,ncol = 3,),
+                 baz=factor(c(1,2,2,3,1,1,3),levels = 1:3,ordered = T)
+)
+somelist
+dput(x=somelist,file = "E:\\Users\\pangcheng\\Desktop\\R语言\\myRobject.txt")
+
+newobject <- dget(file="E:\\Users\\pangcheng\\Desktop\\R语言\\myRobject.txt")
+newobject #以上8行，演示不保存整个工作空间而存储或转移特殊对象dput建立文件dget读入到其他工作空间
+#######################
+#练习8.1
+#######################
+?quakes
+quakes[,4]
+quakes$mag
+write.table(x= quakes[quakes$mag>5,],
+            file = "E:\\Users\\pangcheng\\Desktop\\R语言\\q5.txt",
+            sep="!",na="??",quote=FALSE,row.names = FALSE
+)
+q5.frame <- read.table(file = "E:\\Users\\pangcheng\\Desktop\\R语言\\q5.txt",
+                       header = FALSE,sep="!",
+)
+q5.frame
+install.packages("car")
+library(help="car")
+library(car)
+data(Duncan)
+?Duncan
+plot(Duncan$education[Duncan$prestige<=80],Duncan$income[Duncan$prestige<=80],xlim=c(0,100),ylim=c(0,100),xlab="Education",ylab="Income")
+points(Duncan$education[Duncan$prestige>80],Duncan$income[Duncan$prestige>80],pch=19,col="blue")
+
+#qplot以下方法虽然画出了图，但是思路是不对的#
+library(ggplot2)
+qplot(Duncan$education,Duncan$income,
+      xlab = "Education",ylab = "Income",
+      xlim=c(0,100),ylim=c(0,100),
+      geom = "blank"
+) +
+  geom_point(mapping=aes(Duncan$education[Duncan$prestige<=80],Duncan$income[Duncan$prestige<=80]),
+             size=1.7,shape=3,color="black")+
+  geom_point(mapping=aes(Duncan$education[Duncan$prestige>80],Duncan$income[Duncan$prestige>80]),
+             size=2,shape=4,color="lightblue")
+#qplot以上方法虽然画出了图，但是思路是不对的#
+library(ggplot2)
+Duncan$prestige2 <- rep(NA,length(x=Duncan$prestige))
+Duncan$prestige2[Duncan$prestige<=80] <- "low"
+Duncan$prestige2[Duncan$prestige>80] <- "high"
+Duncan$prestige2 <- factor(x=Duncan$prestige2)
+Duncan$prestige2
+png("E:\\Users\\pangcheng\\Desktop\\R语言\\dunc.png",width=500,height=500)
+qplot(Duncan$education,Duncan$income,
+      xlab = "Education",ylab = "Income",
+      xlim=c(0,100),ylim=c(0,100),
+      color=Duncan$prestige2,shape=Duncan$prestige2
+) +
+  geom_point(size=1.7)
+dev.off()
+?theme
+#theme图例怎么用需要进一步学习#
+exer <- list(quakes,q5.frame,Duncan)
+exer
+dput(x=exer,file = "E:\\Users\\pangcheng\\Desktop\\R语言\\exercise8-1.txt")
+list.of.dataframes <- dget(file="E:\\Users\\pangcheng\\Desktop\\R语言\\exercise8-1.txt")
+list.of.dataframes
+
+library("ggplot2")
+x <- 1:20
+y <- c(-1.49,3.37,2.59,-2.78,-3.94,-0.92,6.43,8.51,3.41,-8.23,-12.01,
+       -6.58,2.87,14.12,9.63,-4.58,-14.78,-11.67,1.17,15.62)
+ptype <- rep(NA,length(x=x))
+ptype[y>=5] <- "too_big"
+ptype[y<=-5] <- "too_small"
+ptype[(x>=5&x<=15)&(y>-5&y<5)] <- "sweet"
+ptype[(x<5|x>15)&(y>-5&y<5)] <- "standard"
+ptype <- factor(x=ptype) #这1行转换为分类对象
+ptype
+qplot(x,y,color=ptype,shape=ptype)+geom_point(size=4)+ #点的大小#
+  geom_line(mapping = aes(group=1),color="black",lty=2)+ #线的颜色和线型#
+  geom_hline(mapping = aes(yintercept=c(-5,5)),color="red")+ #分割通线的颜色#
+  geom_segment(mapping = aes(x=5,y=-5,xend=5,yend=5),color="red",lty=3)+ #线段的颜色和线型#
+  geom_segment(mapping = aes(x=15,y=-5,xend=15,yend=5),color="red",lty=3) #线段的颜色和线型#
+ggsave(filename = "E:\\Users\\pangcheng\\Desktop\\R语言\\mytiffplot.tiff")
+
+#######################
+# 第二部分 编程
+# 9 调用函数
+## 9.1 作用域
+#######################
+
+
+#######################
+# 10 条件和循环
+## 10.1 if语句
+#######################
+### 10.1.1 独立语句
+a<- 3
+mynumber <- 4
+if (a<=mynumber){
+  a <- a^2
+}
+a
+#以上6行，将a和mynumber比大小然后执行if
+
+myvec <- c(2.73,5.40,2.15,5.29,1.36,2.16,1.41,6.97,7.99,9.52)
+myvec
+mymat <- matrix(c(2,0,1,2,3,0,3,0,1,1),5,2)
+mymat
+if(any(myvec-1)>9 || matrix(myvec,2,5)[2,1]<=6){
+  cat("Condition satisfied --\n")
+  new.myvec <- myvec
+  new.myvec[seq(1,9,2)] <- NA
+  mylist <- list(aa=new.myvec,bb=mymat+0.5)
+  cat("-- a list with",length(mylist),"members now exists")
+}
+mylist
+
+myvec
+myvec-1
+(myvec-1)>9
+any((myvec-1)>9)
+#
+matrix(myvec,2,5)
+matrix(myvec,2,5)[2,1]
+matrix(myvec,2,5)[2,1]<=6
+#
+any((myvec-1)>9)||matrix(myvec,2,5)[2,1]<=6
+
+### 10.1.2 else语句
+a <- 3
+mynumber <- 4
+#
+if(a<=mynumber){
+  cat("Condition was",a<=mynumber)
+  a <- a^2
+} else {
+  cat("Condition was",a<=mynumber)
+  a <- a-3.5
+}
+a
+#
+if(a<=mynumber){
+  cat("Condition was",a<=mynumber)
+  a <- a^2
+} else {
+  cat("Condition was",a<=mynumber)
+  a <- a-3.5
+}
+a
+
+### 10.1.3 基于元素水平使用ifelse
+if(c(FALSE,TRUE,FALSE,TRUE,TRUE)){}
+#
+x <- 5
+y <- -5:5
+y
+#
+y==0
+#
+result <- ifelse(test=y==0,yes=NA,no=x/y)
+result
+
+##########
+## 练习 10.1
+##########
+#(a)
+vec1 <- c(2,1,1,3,2,1,0)
+vec2 <- c(3,8,2,2,0,0,0)
+##(i)
+if((vec1[1]+vec2[2])==10){ cat("Print me!") }  # condition SATISFIED
+##(ii)
+if(vec1[1]>=2&&vec2[1]>=2){	cat("Print me!") }  # condition SATISFIED
+##(iii)
+if(all((vec2-vec1)[c(2,6)]<7)){	cat("Print me!") }  # condition NOT SATISFIED
+##(iv)
+if(!is.na(vec2[3])){ cat("Print me!") }  # condition SATISFIED
+#(b)
+ifelse(vec1+vec2>3,vec1*vec2,vec1+vec2)
+#(c)
+if(any(substr(diag(mymat),1,1)=="g")||any(substr(diag(mymat),1,1)=="G")){
+  indexes <- which(substr(diag(mymat),1,1)=="g"|substr(diag(mymat),1,1)=="G")
+  diag(mymat)[indexes] <- "HERE"
+} else {
+  mymat <- diag(nrow(mymat))
+}
+mymat
+##(i)
+mymat <- matrix(as.character(1:16),4,4)
+##(ii)
+mymat <- matrix(c("DANDELION","Hyacinthus","Gerbera","MARIGOLD","geranium","ligularia","Pachysandra","SNAPDRAGON","GLADIOLUS"),3,3)
+##(iii)
+mymat <- matrix(c("GREAT","exercises","right","here"),2,2,byrow=T)
+
+
+### 10.1.4 嵌套和堆叠语句
+a <- 3
+mynumber <- 4
+if(a<=mynumber){
+  cat("First condition was TRUE\n")
+  a <- a^2
+  if(mynumber>3){
+    cat("Second condition was TRUE")
+    b <- seq(1,a,length=mynumber)
+  } else {
+    cat("Second condition was FALSE")
+    b <- a*mynumber
+  }
+} else {
+  cat("First condition was FALSE\n")
+  a <- a-3.5
+  if(mynumber>=4){
+    cat("Second condition was TRUE")
+    b <- a^(3-mynumber)
+  } else {
+    cat("Second condition was FALSE")
+    b <- rep(a+mynumber,times=3)
+  }
+}
+a
+b
+
+#
+a <- 6
+mynumber <- 4
+#
+if(a<=mynumber){
+  cat("First condition was TRUE\n")
+  a <- a^2
+  if(mynumber>3){
+    cat("Second condition was TRUE")
+    b <- seq(1,a,length=mynumber)
+  } else {
+    cat("Second condition was FALSE")
+    b <- a*mynumber
+  }
+} else {
+  cat("First condition was FALSE\n")
+  a <- a-3.5
+  if(mynumber>=4){
+    cat("Second condition was TRUE")
+    b <- a^(3-mynumber)
+  } else {
+    cat("Second condition was FALSE")
+    b <- rep(a+mynumber,times=3)
+  }
+}
+a
+b
+#
+a <- 3
+mynumber <- 4
+if(a<=mynumber && mynumber>3){
+  cat("Same as 'first condition TRUE and second TRUE'")
+  a <- a^2
+  b <- seq(1,a,length=mynumber)
+} else if(a<=mynumber && mynumber<=3){
+  cat("Same as 'first condition TRUE and second FALSE'")	
+  a <- a^2
+  b <- a*mynumber
+} else if(mynumber>=4){
+  cat("Same as 'first condition FALSE and second TRUE'")
+  a <- a-3.5
+  b <- a^(3-mynumber)
+} else {
+  cat("Same as 'first condition FALSE and second FALSE'")
+  a <- a-3.5
+  b <- rep(a+mynumber,times=3)
+}
+a
+b
+#
+a <- 6
+mynumber <- 4
+if(a<=mynumber && mynumber>3){
+  cat("Same as 'first condition TRUE and second TRUE'")
+  a <- a^2
+  b <- seq(1,a,length=mynumber)
+} else if(a<=mynumber && mynumber<=3){
+  cat("Same as 'first condition TRUE and second FALSE'")	
+  a <- a^2
+  b <- a*mynumber
+} else if(mynumber>=4){
+  cat("Same as 'first condition FALSE and second TRUE'")
+  a <- a-3.5
+  b <- a^(3-mynumber)
+} else {
+  cat("Same as 'first condition FALSE and second FALSE'")
+  a <- a-3.5
+  b <- rep(a+mynumber,times=3)
+}
+a
+b
+
+### 10.1.5 转换函数
+mystring <- "Lisa"
+if(mystring=="Homer"){
+  foo <- 12
+} else if(mystring=="Marge"){
+  foo <- 34
+} else if(mystring=="Bart"){
+  foo <- 56
+} else if(mystring=="Lisa"){
+  foo <- 78
+} else if(mystring=="Maggie"){
+  foo <- 90
+} else {
+  foo <- NA
+}
+foo
+#
+mystring <- "Peter"
+if(mystring=="Homer"){
+  foo <- 12
+} else if(mystring=="Marge"){
+  foo <- 34
+} else if(mystring=="Bart"){
+  foo <- 56
+} else if(mystring=="Lisa"){
+  foo <- 78
+} else if(mystring=="Maggie"){
+  foo <- 90
+} else {
+  foo <- NA
+}
+foo
+#
+mystring <- "Lisa"
+foo <- switch(EXPR=mystring,Homer=12,Marge=34,Bart=56,Lisa=78,Maggie=90,NA)
+foo
+#
+mystring <- "Peter"
+foo <- switch(EXPR=mystring,Homer=12,Marge=34,Bart=56,Lisa=78,Maggie=90,NA)
+foo
+#
+mynum <- 3
+foo <- switch(mynum,12,34,56,78,NA)
+foo
+#
+mynum <- 0
+foo <- switch(mynum,12,34,56,78,NA)
+foo
+
+##########
+## 练习 10.2
+##########
+mynum <- 3
+mynum <- 0
+#(a)
+if(mynum==1){
+  foo <- 12
+} else if(mynum==2){
+  foo <- 34
+} else if(mynum==3){
+  foo <- 56
+} else if(mynum==4){
+  foo <- 78
+} else if(mynum==5){
+  foo <- NA
+} else {
+  foo <- NULL
+}
+foo
+#(b)
+if(any(doselevel=="High")){
+  if(lowdose>=10){
+    lowdose <- 10
+  } else {
+    lowdose <- lowdose/2
+  }
+  if(meddose>=26){
+    meddose <- 26
+  }
+  if(highdose<60){
+    highdose <- 60
+  } else {
+    highdose <- highdose*1.5
+  }
+  dosage <- rep(lowdose,length(doselevel))
+  dosage[doselevel=="Med"] <- meddose
+  dosage[doselevel=="High"] <- highdose
+} else {
+  doselevel <- factor(doselevel,levels=c("Low","Med"),labels=c("Small","Large"))
+  if(lowdose<15 && meddose<35){
+    lowdose <- lowdose*2
+    meddose <- meddose+highdose
+  }
+  dosage <- rep(lowdose,length(doselevel))
+  dosage[doselevel=="Large"] <- meddose
+}
+##(i)
+lowdose <- 12.5
+meddose <- 25.3
+highdose <- 58.1
+doselevel <- factor(c("Low","High","High","High","Low","Med","Med"),levels=c("Low","Med","High"))
+##(ii)
+lowdose <- 12.5
+meddose <- 25.3
+highdose <- 58.1
+doselevel <- factor(c("Low","Low","Low","Med","Low","Med","Med"),levels=c("Low","Med","High"))
+##(iii)
+lowdose <- 9
+meddose <- 49
+highdose <- 61
+doselevel <- factor(c("Low","Med","Med"),levels=c("Low","Med","High"))
+##(iv)
+lowdose <- 9
+meddose <- 49
+highdose <- 61
+doselevel <- factor(c("Low","High","High","High","Low","Med","Med"),levels=c("Low","Med","High"))
+#(c)
+mynum <- 3
+ifelse(mynum>0,switch(mynum,"one","two","three","four","five","six","seven","eight","nine"),"zero")
+mynum <- 0
+ifelse(mynum>0,switch(mynum,"one","two","three","four","five","six","seven","eight","nine"),"zero")
+
+## 10.2 循环代码
+### 10.2.1 for循环
+for (myitem in 5:7){
+  cat("-- BRACED AREA BEGINS--\n")
+  cat("the current item is",myitem,"\n")
+  cat("-- BRACED AREA ENDS--\n\n")
+}
+#以上5行，展示for循环的基本形式#
+counter <- 0
+for (myitem in 5:7){
+  counter <- counter+1
+  cat("The item is run",counter,"is",myitem,"\n")
+}
+#以上5行，展示用循环递增counter#
+myvec <- c(0.4,1.1,0.34,0.55)
+for (i in myvec){
+  print(2*i)
+}
+for (i in 1:length(myvec)){
+  print(2*myvec[i])
+}
+#以上7行，展示i直接表示myvec中的元素与表示myvec中的元素索引的书写区别#
+foo <- list(aa=c(3.4,1),bb=matrix(1:4,2,2),cc=matrix(c(T,T,F,T,F,F),3,2),
+            dd="string here",ee=matrix(c("red","green","blue","yellow"))
+)
+foo
+name <- names(foo)
+name
+is.mat <- rep(NA,length(foo))
+is.mat
+nr <- is.mat
+nc <- is.mat
+data.type <- is.mat
+
+for(i in 1:length(foo)){
+  member <- foo[[i]] #这里读取的是变量值，不是list内的矩阵#
+  if(is.matrix(member)){
+    is.mat[i]<- "Yes"
+    nr[i]<- nrow(member)
+    nc[i]<- ncol(member)
+    data.type[i]<- class(as.vector(member))
+  }else{
+    is.mat[i]<- "No"
+  }
+}
+bar <- data.frame(name,is.mat,nr,nc,data.type,stringsAsFactors = FALSE)
+bar
+#以上26行，展示利用for循环与if重复执行，重点是先定义了完全整个NA#
+
+loopvec1<- 5:7
+loopvec1
+loopvec2<- 9:6
+loopvec2
+foo <- matrix(NA,length(loopvec1),length(loopvec2))
+foo
+for(i in 1:length(loopvec1)){
+  for (j in 1:length(loopvec2)) {
+    foo[i,j]<- loopvec1[i]*loopvec2[j]
+  }
+}
+foo
+#以上12行，展示正确的循环填充数值方式#
+loopvec1<- 5:7
+loopvec1
+loopvec2<- 9:6
+loopvec2
+foo <- matrix(NA,length(loopvec1),length(loopvec2))
+foo
+for(i in 1:length(loopvec1)){
+  for (j in 1:i) {
+    foo[i,j]<- loopvec1[i]*loopvec2[j]
+  }
+}
+foo
+#以上12行，展示错误的循环填充数值方式#
+foo <- matrix(NA,length(loopvec1),length(loopvec2))
+foo
+for(i in 1:length(loopvec1)){
+  for(j in 1:i){
+    foo[i,j] <- loopvec1[i]+loopvec2[j]
+  }
+}
+foo
+
+##########
+## 练习 10.3 ##
+##########
+#(a)
+loopvec1 <- 5:7
+loopvec2 <- 9:6
+foo <- matrix(NA,length(loopvec1),length(loopvec2))
+for(i in 1:length(loopvec1)){
+  foo[i,] <- loopvec1[i]*loopvec2
+}
+foo
+#(b)
+mystrings <- c("Peter","Homer","Lois","Stewie","Maggie","Bart")
+mynums <- rep(NA,length(mystrings))
+for(i in 1:length(mystrings)){
+  mynums[i] <- switch(EXPR=mystrings[i],Homer=12,Marge=34,Bart=56,Lisa=78,Maggie=90,NA)
+}
+#(c)
+counter <- 0
+for(i in 1:length(mylist)){
+  member <- mylist[[i]]
+  if(is.matrix(member)){
+    counter <- counter+1
+  } else if(is.list(member)){
+    for(j in 1:length(member)){
+      if(is.matrix(member[[j]])){
+        counter <- counter+1
+      }
+    }
+  }
+}
+##(i)
+mylist <- list(aa=c(3.4,1),bb=matrix(1:4,2,2),cc=matrix(c(T,T,F,T,F,F),3,2),dd="string here",ee=list(c("hello","you"),matrix(c("hello","there"))),ff=matrix(c("red","green","blue","yellow")))
+##(ii)
+mylist <- list("tricked you",as.vector(matrix(1:6,3,2)))
+##(iii)
+mylist <- list(list(1,2,3),list(c(3,2),2),list(c(1,2),matrix(c(1,2))),rbind(1:10,100:91))
+
+### 10.2.2 while 循环
+myval <- 5
+while(myval<10){
+  myval <- myval+1
+  cat("\n'myval' is now",myval,"\n")
+  cat("'mycondition' is now",myval<10,"\n")
+}
+
+#
+
+mylist <- list()
+counter <- 1
+mynumbers <- c(4,5,1,2,6,2,4,6,6,2)
+mycondition <- mynumbers[counter]<=5
+while(mycondition){
+  mylist[[counter]] <- diag(mynumbers[counter])
+  counter <- counter+1
+  if(counter<=length(mynumbers)){
+    mycondition <- mynumbers[counter]<=5
+  } else {
+    mycondition <- FALSE
+  }
+}
+
+#
+
+mylist
+
+##########
+## 练习 10.4 ##
+##########
+#(a)
+##(i)
+mylist <- list()
+counter <- 1
+mynumbers <- c(2,2,2,2,5,2)
+mycondition <- mynumbers[counter]<=5
+mycondition
+while(mycondition){
+  mylist[[counter]] <- diag(mynumbers[counter])
+  counter <- counter+1
+  if(counter<=length(mynumbers)){
+    mycondition <- mynumbers[counter]<=5
+  } else {
+    mycondition <- FALSE
+  }
+}
+mylist
+##(ii)
+mylist <- list()
+counter <- 1
+mynumbers <- 2:20
+mycondition <- mynumbers[counter]<=5
+mycondition
+while(mycondition){
+  mylist[[counter]] <- diag(mynumbers[counter])
+  counter <- counter+1
+  if(counter<=length(mynumbers)){
+    mycondition <- mynumbers[counter]<=5
+  } else {
+    mycondition <- FALSE
+  }
+}
+mylist
+##(iii) below, the loop braced-area code won't even be entered -- the first element of 'mynumbers' is greater than 5 -- resulting list will be empty
+mylist <- list()
+counter <- 1
+mynumbers <- c(10,1,10,1,2)
+mycondition <- mynumbers[counter]<=5
+mycondition
+while(mycondition){
+  mylist[[counter]] <- diag(mynumbers[counter])
+  counter <- counter+1
+  if(counter<=length(mynumbers)){
+    mycondition <- mynumbers[counter]<=5
+  } else {
+    mycondition <- FALSE
+  }
+}
+mylist
+#(b)
+mynum.fac <- 1
+while(mynum>1){
+  mynum.fac <- mynum.fac*mynum
+  mynum <- mynum-1
+}
+mynum.fac
+##(i)
+mynum <- 5
+##(ii)
+mynum <- 12
+##(iii)
+mynum <- 0
+#(c)
+mystring <- "R fever"
+mystring <- "beautiful"
+mystring <- "ECCENTRIC"
+mystring <- "ElAbOrAte"
+mystring <- "eeeeek!"
+#--#
+index <- 1
+ecount <- 0
+result <- mystring
+while(ecount<2 && index<=nchar(mystring)){
+  temp.char <- substr(mystring,index,index)	
+  if(temp.char=="e"||temp.char=="E"){
+    ecount <- ecount+1
+  }
+  if(ecount==2){
+    result <- substr(mystring,1,index-1)
+  }
+  index <- index + 1
+}
+result
+
+### 10.2.3 使用apply的隐式循环
+
+foo <- matrix(1:12,4,3)
+foo
+
+#
+
+sum(foo)
+# 以上1行，展示sum仅能获得总和，无法获得各行的和
+
+row.totals <- rep(NA,times=nrow(foo))
+for(i in 1:nrow(foo)){
+  row.totals[i] <- sum(foo[i,])
+}
+row.totals
+#以上5行，展示使用for显性循环获得各行总和
+
+row.totals2 <- apply(X=foo,MARGIN=1,FUN=sum)
+row.totals2
+#以上2行，展示使用apply隐性循环获得各行总和
+
+apply(X=foo,MARGIN=2,FUN=sum)
+#MARGIN的1表示行、2表示列、3表示层、4表示块
+
+bar <- array(1:18,dim=c(3,3,2))
+bar
+apply(bar,MARGIN=3,FUN=diag)
+#以上3行，展示所取函数FUN，一定要适合MARGIN本身
+
+dia.url <- "http://jse.amstat.org/v9n2/4Cdata.txt"
+diamonds <- read.table(dia.url)
+names(diamonds) <- c("Carat","Color","Clarity","Cert","Price")
+diamonds[1:5,]
+#
+tapply(diamonds$Price,INDEX=diamonds$Color,FUN=sum)
+
+#
+
+baz <- list(aa=c(3.4,1),bb=matrix(1:4,2,2),cc=matrix(c(T,T,F,T,F,F),3,2),dd="string here",ee=matrix(c("red","green","blue","yellow")))
+
+#
+
+lapply(baz,FUN=is.matrix)
+
+#
+
+sapply(baz,FUN=is.matrix)
+
+#
+
+apply(foo,1,sort,decreasing=TRUE)
+#######################
+#练习10.3
+#######################
+loopvec1<- 5:7
+loopvec1
+loopvec2<- 9:6
+loopvec2
+foo <- matrix(NA,length(loopvec1),length(loopvec2))
+foo
+for(i in 1:length(loopvec1)){
+  foo[i,1:length(loopvec2)]<- loopvec1[i]*loopvec2
+  
+}
+foo
+
+mystring <- c("Peter","Homer","Lois","Stewie","Maggie","Bart")
+mystring.tp <- rep(x=NA,length=length(mystring))
+#注意：应该先定义NA向量，再用循环赋值#
+for (i in 1:length(mystring)){
+  mystring.tp[i]<- switch (EXPR=mystring[i],
+                           Homer = 12,Marge=34,Bart=56,Lisa=78,Maggie=90,NA)
+  
+}
+mystring.tp
+
+mylist <- list(aa=c(3,4,1),bb=matrix(1:4,2,2),
+               cc=matrix(c(T,T,F,T,F,F),3,2),dd="string here",
+               ee=list(c("hello","you"),matrix(c("hello","there"))),
+               ff=matrix(c("red","green","blue","yellow"))
+)
+mylist <- list("tricked you",as.vector(matrix(1:6,3,2)))
+mylist <- list(list(1,2,3),list(c(3,2),2),
+               list(c(1,2),matrix(c(1,2))),
+               rbind(1:10,100:91))
+mylist
+counter <- 0
+for (i in 1:length(mylist)){
+  if (is.list(mylist[[i]])==FALSE){
+    if(is.matrix(mylist[[i]])==TRUE){
+      counter <- counter+1
+    }
+  }else{
+    for (j in 1:length(mylist[[i]])){
+      if(is.matrix(mylist[[i]][[j]])==TRUE){
+        counter <- counter+1
+      }
+    }
+  }
+}
+counter
+## 10.3.1 ##
+
+foo <- 5
+bar <- c(2,3,1.1,4,0,4.1,3)
+
+#
+
+loop1.result <- rep(NA,length(bar))
+loop1.result
+for(i in 1:length(bar)){
+  temp <- foo/bar[i]
+  if(is.finite(temp)){
+    loop1.result[i] <- temp
+  } else {
+    break
+  }
+}
+loop1.result
+
+#
+
+loop2.result <- rep(NA,length(bar))
+loop2.result
+for(i in 1:length(bar)){
+  if(bar[i]==0){
+    next
+  }
+  loop2.result[i] <- foo/bar[i]
+}
+loop2.result
+
+#
+
+loopvec1 <- 5:7
+loopvec1
+loopvec2 <- 9:6
+loopvec2
+baz <- matrix(NA,length(loopvec1),length(loopvec2))
+baz
+for(i in 1:length(loopvec1)){
+  for(j in 1:length(loopvec2)){
+    temp <- loopvec1[i]*loopvec2[j]
+    if(temp>=54){
+      next
+    }
+    baz[i,j] <- temp
+  }	
+}
+baz
+
+
+## 10.3.2 ##
+
+fib.a <- 1
+fib.b <- 1
+repeat{
+  temp <- fib.a+fib.b
+  fib.a <- fib.b
+  fib.b <- temp
+  cat(fib.b,", ",sep="")
+  if(fib.b>150){
+    cat("BREAK NOW...\n")
+    break
+  }
+}
+
+
+#######################
+#练习10.4
+#######################
+mylist <- list()
+counter <- 1
+mynumbers <- c(2,2,2,2,5,2)
+mycondition <- mynumbers[counter]<=5
+mycondition
+while(mycondition){
+  mylist[[counter]] <- diag(mynumbers[counter])
+  counter <- counter+1
+  if(counter<=length(mynumbers)){
+    mycondition <- mynumbers[counter]<=5
+  } else {
+    mycondition <- FALSE
+  }
+}
+mylist
+
+mynum <-0
+mynum.agg <- mynum
+if(mynum>0){
+  while(mynum>1){
+    mynum.agg <- mynum.agg*(mynum-1)
+    mynum <- mynum-1
+  }
+}else {
+  mynum.agg <- 1
+}
+mynum.agg
+
+mystring <- "eeeeek!"
+index <-1
+ecount <-0
+result <- mystring
+while (ecount <2 && index<=nchar(mystring)){ #nchar用于测量字符串中字符的数量#
+  if(substr(x=mystring,start =index,stop = index ) == "e" || 
+     substr(x=mystring,start =index,stop = index )== "E"){
+    ecount=ecount+1
+  }
+  if(ecount==2){
+    result<-substr(x=mystring,start =1,stop = index-1)
+  }
+  index=index+1
+}
+result
+
+#10.2.3 使用apply的隐式循环#
+foo <- matrix(1:12,4,3)
+foo
+sum(foo) #以上3行，展示sum仅能在矩阵求所有行的总和#
+row.totals <- rep(NA,times=nrow(foo))
+for (i in 1:nrow(foo)){
+  row.totals[i] <- sum(foo[i,]) #这个sum展示求和一行#
+}
+row.totals #以上5行，用for的显性循环进行矩阵每一行的求和
+row.totals2 <- apply(X=foo,MARGIN = 1,FUN=sum)
+row.totals2
+#以上2行，展示apply的隐性循环，MARGIN的1表示行，2表示列，3表示层，4表示块
+apply(X=foo,MARGIN = 2,FUN=sum)
+#以上1行，展示apply的列求和，(apply边界隐式循环)
+bar <- array(1:18,dim = c(3,3,2))
+bar
+apply(bar,3,FUN = diag)
+#以上3行，展示在三维的数组方面如何用APPLY#
+dia.url <- "http://jse.amstat.org/v9n2/4Cdata.txt"
+diamonds <- read.table(dia.url)
+names(diamonds) <- c("Carat","Color","Clarity","Cert","Price")
+diamonds[1:5,]
+tapply(X=diamonds$Price,INDEX=diamonds$Color,FUN = sum)
+#以上5行，展示tapply用于1个或多个因子向量factor的隐性统计，(tapply因子隐式循环)#
+baz <- list(aa=c(3,4,1),bb=matrix(1:4,2,2),cc=matrix(c(T,T,F,T,F,F),3,2),
+            dd="string here",ee=matrix(c("red","green","blue","yellow"))
+)
+baz
+lapply(baz,FUN=is.matrix)
+#以上5行，展示lapply对list列表逐项操作，以list形式返回逻辑值，(lapply成员隐式循环)#
+temp <-sapply(baz,FUN=is.matrix)
+mode(temp)
+class(temp)
+temp[1]
+names(temp)
+#以上5行，展示sapply对list列表逐项操作，以一维数组ARRAY的特殊形式返回逻辑值#
+#vapply#mapply可以同时对多重向量vector或list操作
+
+apply(foo,MARGIN =1,sort,decreasing=TRUE)
+#以上1行，展示对每一行进行降序sort
+
+## 练习10.5
+foo <- matrix(1:12,4,3)
+apply(apply(foo,1,sort,decreasing=TRUE),2,prod)
+
+apply(foo,1,prod)
+#以上1行，与以上2行的结果相同，没明白题目想要表答的意思#
+apply(X=foo,MARGIN=1,FUN= sort,decreasing=TRUE) #以上1行，展示依行进行降序排序#
+matlist <- list(matrix(c(T,F,T,T),2,2),
+                matrix(c("a","c","b","z","p","q"),3,2), 
+                matrix(1:8,2,4)
+)
+matlist
+for (i in 1:length(matlist)){
+  matlist[[i]] <- t(matlist[[i]]) #t用于转置矩阵#
+}
+matlist
+
+matlist <- list(matrix(c(T,F,T,T),2,2),
+                matrix(c("a","c","b","z","p","q"),3,2), 
+                matrix(1:8,2,4)
+)
+matlist
+lapply(X=matlist,FUN=t) #以上1行，与以上的for循环等价
+
+qux <- array(96:1,dim=c(4,4,2,3))
+qux
+apply(qux[,,2,],3,FUN = diag)
+#以上3行，展示如何访问array四维数组的某一层#
+apply(apply(qux[,4,,],3,dim),1,sum)
+
+## 10.3其他控制流程机制#
+### 10.3.1 break或next声明
+foo <-5
+bar <- c(2,3,1.1,4,0,4.1,3)
+foo/bar 
+loop1.result <- rep(NA,length(bar))
+loop1.result
+for(i in 1:length(bar)){
+  temp <- foo/bar[i]
+  if(is.finite(temp)){
+    loop1.result[i] <- temp
+  } else {
+    break
+  }
+}
+loop1.result
+#以上14行，展示用break停止程序#
+loop2.result <- rep(NA,times=length(bar))
+loop2.result
+for (i in 1:length(bar)){
+  if(bar[i]==0){
+    next
+  }
+  loop2.result[i] <- foo/bar[i]
+}
+loop2.result
+#以上14行，展示用next跳过某些值#
+loopvec1 <- 5:7
+loopvec1
+loopvec2 <- 9:6
+loopvec2
+baz <- matrix(NA,length(loopvec1),length(loopvec2))
+baz
+for (i in 1:length(loopvec1)){
+  for (j in 1:length(loopvec2)) {
+    temp <- loopvec1[i]*loopvec2[j]
+    if(temp>=54){
+      next
+    }
+    baz[i,j] <- temp
+  }
+}
+baz
+#以上16行，展示有条件使用next跳过某些值#
+
+### 10.3.2 repeat语句#
+fib.a <- 1
+fib.b <- 1
+repeat{
+  temp <-  fib.a+fib.b
+  fib.a<- fib.b
+  fib.b<- temp
+  cat(fib.b,", ",sep = "")
+  if(fib.b>150){
+    cat("BREAK NOW...\n")
+    break
+  }
+}
+#以上12行，展示repeat计算斐波那契数列，必须与break连用#
+
+## 练习10.6#
+foo <- 5
+bar <- c(2,3,1.1,4,0,4.1,3)
+loop.result <- rep(NA,length(bar))
+loop.result
+i<-1
+while (bar[i]>1){
+  loop.result[i] <- foo/bar[i]
+  i=i+1
+}
+loop.result
+
+foo <- 5
+bar <- c(2,3,1.1,4,0,4.1,3)
+loop.result <-ifelse(test=bar>0,yes=(foo/bar),no=NA)
+loop.result
+
+mynumbers <- c(4,5,1,2,6,2,4,6,6,2)
+mylist <- list() #首先mylist必须是list，否则无法替换#
+counter <- 1
+for(i in 1:length(mynumbers)){
+  if(mynumbers[i]>5){
+    break
+  }else{
+    mylist[[counter]] <- diag(mynumbers[counter])
+    counter <- counter+1
+  }
+}
+mylist
+
+mynumbers <- c(4,5,1,2,6,2,4,6,6,2)
+mylist <- list() #首先mylist必须是list，否则无法替换#
+counter <- 1
+repeat{
+  if(counter<=length(mynumbers)){
+    if(mynumbers[counter]<=5){
+      mylist[[counter]] <- diag(mynumbers[counter])
+    } else {
+      break
+    }
+  } else {
+    break
+  }
+  counter <- counter+1
+}
+mylist
+
+#(c)
+counter <- 0
+reslist <- list()
+for(i in 1:length(matlist1)){
+  for(j in 1:length(matlist2)){
+    counter <- counter+1
+    if(ncol(matlist1[[i]])!=nrow(matlist2[[j]])){
+      reslist[[counter]] <- "not possible"
+      next
+    }
+    reslist[[counter]] <- matlist1[[i]]%*%matlist2[[j]]
+  }
+}
+reslist #矩阵的乘法中，必须m*n矩阵A、p*q矩阵B中，n=p#
+##(i)
+matlist1 <- list(matrix(1:4,2,2),matrix(1:4),matrix(1:8,4,2))
+matlist2 <- matlist1
+##(ii)
+matlist1 <- list(matrix(1:4,2,2),matrix(2:5,2,2),matrix(1:16,4,2))
+matlist2 <- list(matrix(1:8,2,4),matrix(10:7,2,2),matrix(9:2,4,2))
+
+
+#先排序后冒泡
+# 11 编写函数
+## 11.1 函数命令
+### 11.1.1 创建函数
+
+
+
+#######################
+# 第三部分 统计学与概率
+# 13 初级统计学
+#######################
+## 13.1 描述原始数据
+### 13.1.1 数值型变量
+#### 细分为连续型数值变量和离散型数值变量
+
+### 13.1.2 分类变量
+library(datasets)
+chickwts
+?chickwts
+data(chickwts) #以上4行，加载chickwts数据集到R内
+chickwts$weight
+chickwts$feed #以上2行，演示单变量数据
+
+### 13.1.3 单变量和多变量数据
+quakes[1:5,]
+plot(quakes$long,quakes$lat,xlab = "Longitude",ylab = "Latitude") #以上1行，演示多变量数据
+
+### 13.1.4 参数和统计量
+#### 总体population的特征平均值μ叫参数parameter，样本sample的特征平均值x叫统计量statistic
+
+##########
+## 练习 13.1
+##########
+#(a)
+##(i) Numeric-discrete
+##(ii) Categorical-ordinal
+##(iii) Numeric-continuous
+##(iv) Categorical-ordinal
+##(v) Categorical-nominal
+##(vi) Numeric-continuous
+#(b)
+##(i) Sample statistic. Population parameter is the proportion of NZers who own a gaming console.
+##(ii) Sample statistic. Population parameter is the average number of blemishes on the hoods of all cars at No Dodgy Carz.
+##(iii) Population parameter.
+##(iv) Population parameter.
+##(v) Sample statistic. Population parameter is (iv).
+
+## 13.2 统计概要
+### 13.2.1 集中趋势：均值、中位数、众数
+xdata <- c(2,4.4,3,3,2,2.2,2,4) 
+x.bar <- mean(xdata) 
+x.bar #以上3行，算均值 
+m.bar <- median(xdata)
+m.bar #以上2行，算中位数
+xtab <- table(xdata)
+xtab #以上2行，table函数给出观测值频数，然后肉眼识别众数
+min(xdata)
+max(xdata)
+range(xdata)
+max(xtab)
+d.bar <- xtab[xtab==max(xtab)]
+d.bar #以上3行，利用max和table函数自动获得众数
+mean(chickwts$weight) #以上1行，算平均值，均数 
+median(chickwts$weight) #以上1行，算中位数
+Qtab <- table(quakes$mag)
+Qtab[Qtab==max(Qtab)] #以上2行，演示算众数，众数计算必须分2行写！
+mean(c(1,4,NA))
+mean(c(1,4,NaN))
+mean(c(1,4,NA),na.rm = TRUE)
+mean(c(1,4,NaN),na.rm = TRUE) #以上4行，演示忽略NA或NaN值进行平均数计算
+
+mean(chickwts$weight[chickwts$feed=="casein"])
+mean(chickwts$weight[chickwts$feed=="horsebean"])
+mean(chickwts$weight[chickwts$feed=="linseed"])
+mean(chickwts$weight[chickwts$feed=="meatmeal"])
+mean(chickwts$weight[chickwts$feed=="soybean"])
+mean(chickwts$weight[chickwts$feed=="sunflower"])
+#以上6行，展示重复mean浪费，用tapply
+tapply(chickwts$weight, INDEX = chickwts$feed, FUN = mean) #以上1行，根据分类变量，自动计算各组的平均值，注意大小写！
+
+### 13.2.2 计数、百分比和比例
+table(chickwts$feed) #以上1行，得到分类变量的频数
+nrow(chickwts) #以上1行，得到观测值总数
+table(chickwts$feed)/nrow(chickwts) #以上1行，得到每个分类的观测值比例
+sum(chickwts$feed=="soybean")/nrow(chickwts)
+mean(chickwts$feed=="soybean") #以上2行，演示得到某一个分类的占比例的2种不同方法
+mean(chickwts$feed=="soybean"|chickwts$feed=="horsebean") #以上1行，演示组合2个分类占比例的方法
+tapply(chickwts$weight, INDEX = chickwts$feed, FUN = function(x) length(x)/nrow(chickwts))
+table(chickwts$feed)/nrow(chickwts) #以上2行，演示得到每个分类比例的2种不同方法
+round(table(chickwts$feed)/nrow(chickwts),digits = 3) #以上1行，演示四舍五入到小数点后3位
+round(mean(chickwts$feed=="soybean")*100,digits = 1) #以上1行，演示百分比并四舍五入到1位
+#######################
+#练习13.2
+#######################
+library(datasets)
+data("quakes")
+sum(quakes$depth>=300)/nrow(quakes)
+round(mean(quakes$depth>=300),2)
+mean(quakes$mag[quakes$depth>=300])
+median(quakes$mag[quakes$depth>=300])
+deptab <- table(quakes$depth[quakes$depth>=300])
+deptab[deptab==max(deptab)] #众数计算必须分2行写
+round(tapply(chickwts$weight, INDEX = chickwts$feed, FUN = function(x) length(x)/nrow(chickwts)),1)
+library(datasets)
+data("InsectSprays")
+?InsectSprays
+View(InsectSprays)
+#连续变量:离散
+#分类变量：名义无序
+count <- factor(x=InsectSprays$count)
+class(count)
+Qtav <- table(count)
+Qtav[Qtav==max(Qtav)]
+tapply(InsectSprays$count, INDEX = InsectSprays$spray, FUN = sum)
+round(
+  tapply(InsectSprays$count[InsectSprays$count>=5], INDEX = InsectSprays$spray[InsectSprays$count>=5], FUN = mean)
+  ,0)
+
+#######################
+### 13.2.3四分位数、百分位数和五分位数概括法
+#######################
+xdata <- c(2,2,2,2.2,3,3,4,4.4)
+quantile(xdata,prob = 0.8) #以上2行，演示80%分位
+quantile(xdata,prob = c(0,0.25,0.5,0.75,1))  #以上1行，演示各种分位
+summary(xdata) #以上1行，演示表达连续变量的离散趋势
+quantile(chickwts$weight,prob = c(0.25,0.75)) #以上1行，演示四分位
+summary(quakes$mag[quakes$depth<400]) #以上1行，演示表达连续变量的离散趋势
+
+#######################
+#13.2.4 离散程度：方差、标准差和四分位差
+#######################
+xdata <- c(2,2,2,2.2,3,3,4,4.4)
+ydata <- c(1,4.4,1,3,2,2.2,2,7)
+mean(xdata)
+mean(ydata) #以上4行，演示2个数据集的均数是一致的
+plot(xdata,type = "n",xlab = "",ylab = "data vector",yaxt="n",bty="n") #yaxt="n"不绘制Y轴,bty="n"不绘制边框
+abline(h=c(3,3.5),lty=2,col="grey")
+abline(v=2.825,lwd=2,lty=3,col="gray")
+text(c(0.8,0.8),c(3,3.5),labels = c("x","y"))
+points(jitter(c(xdata,ydata)),c(rep(3,length(xdata)),rep(3.5,length(ydata)))) #以上5行，说明连续变量的点的离散趋势，jitter轻微抖动相同的观测值
+
+var(xdata) #以上1行，计算方差
+sd(xdata) #以上1行，计算标准差
+IQR(xdata)#以上1行，计算四分位间距
+sqrt(var(xdata))  #以上1行，计算标准差
+as.numeric(quantile(xdata,0.75)-quantile(xdata,0.25)) #以上1行，计算四分位间距,as.numeric用于删除quantile函数的百分数注释
+sd(ydata) #以上1行，计算标准差
+IQR(ydata)#以上1行，计算四分位间距
+sd(chickwts$weight) #以上1行，计算标准差
+summary(quakes$mag[quakes$depth<400]) #以上1行，演示表达连续变量的离散趋势
+IQR(quakes$mag[quakes$depth<400]) #以上1行，计算四分位间距
+
+#######################
+## 练习 13.3
+#######################
+library(datasets)
+data("chickwts")
+quantile(chickwts$weight,prob = c(0.1,0.3,0.9))
+chickvars <- tapply(chickwts$weight,INDEX=chickwts$feed,FUN=var)
+chickvars[chickvars==max(chickvars)]
+class(quakes$depth)
+summary(quakes$depth)
+IQR(quakes$depth)
+summary(quakes$mag[quakes$depth<400])
+summary(quakes$mag[quakes$depth>=400])
+dmin <- min(quakes$depth)
+dmax <- max(quakes$depth)
+depthcat <- cut(quakes$depth,breaks=seq(dmin,dmax,length=5),include.lowest=TRUE,right=FALSE)
+levels(depthcat)
+summary(depthcat)
+table(depthcat)
+vec.b <- data.frame(depthcat,quakes$depth)
+tapply(vec.b[,2], INDEX = vec.b[,1], FUN = mean)
+tapply(vec.b[,2], INDEX = vec.b[,1], FUN = sd)
+tapply(vec.b[,2], INDEX = vec.b[,1], FUN = quantile,prob=0.8)
+
+#######################
+#13.2.5协方差和相关系数
+#######################
+xdata <- c(2,4.4,3,3,2,2.2,2,4) #数的顺序会影响协方差和相关性！
+ydata <- c(1,4.4,1,3,2,2.2,2,7) #数的顺序会影响协方差和相关性！
+mean(xdata)
+mean(ydata) #以上4行，演示2个数据集的均数是一致的
+cov(xdata,ydata) #以上1行，演示算2组的协方差
+cov(xdata,ydata)/(sd(xdata)*sd(ydata))
+cor(xdata,ydata)#以上2行，演示算2组的Pearson相关系数的2种不同方法，注意：Pearson仅能辨别直线，所以需画图辅助辨别
+plot(xdata,ydata,pch=13,cex=1.5) #以上1行，画2组的相关性
+plot(quakes$mag,quakes$stations,xlab = "Magnitude",ylab = "No. of stations")
+cov(quakes$mag,quakes$stations)
+cor(quakes$mag,quakes$stations) #以上3行，演示算2组的协方差和Pearson相关系数的完整过程
+?cor #查看非线性的斯皮尔曼等级相关系数Spearman与kendall肯德尔等级相关系数检验
+cor(quakes$mag,quakes$stations, method = "spearman")
+cor(quakes$mag,quakes$stations, method = "kendall")
+
+#######################
+#13.2.6异常值
+#######################
+foo <- c(0.6,-0.6,0.1,-0.2,-1.0,0.4,0.3,-1.8,1.1,6.0)
+plot(foo,rep(0,10),yaxt="n",ylab = "",bty="n",cex=2,cex.axis=1.5,cex.lab=1.5)
+abline(h=0,col="grey",lty=2)
+arrows(5,0.5,5.9,0.1,lwd = 2)
+text(x=5,y=0.7,labels= "outlier?",cex = 3) #以上5行，演示画plot图查看单一变量的异常值
+bar <- c(0.1,0.3,1.3,0.6,0.2,-1.7,0.8,0.9,-0.8,-1.0)
+baz <- c(-0.3,0.9,2.8,2.3,1.2,-4.1,-0.4,4.1,-2.3,-100.0)
+plot(bar,baz,axes = TRUE, cex=2,cex.axis=1.5,cex.lab=1.5)
+arrows(-0.5,-80,-0.94,-97,lwd=2)
+text(x=-0.45,y=-74,labels= "outlier?",cex = 3) #以上5行，演示画plot图查看二元变量的异常值
+mean(foo)
+mean(foo[-10]) #以上2行，演示包含与剔除异常值后，单一变量均数
+cor(bar,baz)
+cor(bar[-10],baz[-10]) #以上2行，演示包含与剔除异常值后，二元变量相关系数
+
+#######################
+#练习13.4
+#######################
+x <- c(55,85,75,42,93,63,58,75,89,67)
+y <- c(161,185,174,154,188,178,170,167,181,178)
+plot(x,y,type = "n",main = "Height against weight for 10 people",xlab="weight (Kg)",ylab="height (cm)")
+points(x=c(55,42,58,67),y=c(161,154,170,178),pch=4,col="magenta",cex=2)
+points(x=c(85,75,93,63,75,89),y=c(185,174,188,178,167,181),pch=5,col="turquoise",cex=1)
+legend("topleft", #另可topright等，决定图例位置#
+       legend=c("female","male"), #图例文字说明#
+       pch=c(4,5),
+       col=c("magenta","Turquoise"),
+       pt.cex = c(2,1)
+)
+cov(x,y)
+cor(x,y)
+library(datasets)
+data("mtcars")
+?mtcars
+plot(mtcars$hp,mtcars$qsec)
+cor(mtcars$hp,mtcars$qsec)
+tranfac <- factor(x=mtcars$am,labels=c("auto","manul"))
+tranfac
+library(ggplot2)
+qplot(mtcars$hp,mtcars$qsec,color=tranfac,shape=tranfac)
+cor(mtcars$hp[tranfac=="auto"],mtcars$qsec[tranfac=="auto"])
+cor(mtcars$hp[tranfac=="manul"],mtcars$qsec[tranfac=="manul"])
+data("chickwts")
+?chickwts
+View(chickwts)
+plot(chickwts[chickwts$feed=="sunflower",],rep(0,max(table(chickwts$feed[chickwts$feed=="sunflower"]))))
+sd(chickwts$weight[chickwts$feed=="sunflower"])
+IQR(chickwts$weight[chickwts$feed=="sunflower"])
+quantile(chickwts$weight[chickwts$feed=="sunflower"])
+sunchicks <- chickwts$weight[chickwts$feed=="sunflower"]
+sd(
+  sunchicks[-which(sunchicks==min(sunchicks))]
+)
+IQR(
+  sunchicks[-which(sunchicks==min(sunchicks))]
+)
+
+#######################
+# 14 数据可视化基础
+#######################
+#######################
+## 14.1 条形图和饼图
+#######################
+### 14.1.1 绘制条形图
+mtcars[1:5,]
+?mtcars
+cyl.freq <- table(mtcars$cyl)
+cyl.freq
+barplot(cyl.freq) #以上6行，演示画垂直条形图
+table(mtcars$cyl[mtcars$am==0])
+table(mtcars$cyl[mtcars$am==1])
+cyl.freq.matrix <- table(mtcars$am,mtcars$cyl)
+cyl.freq.matrix #以上4行，演示画R*C表的方法
+barplot(cyl.freq.matrix) #以上1行，绘制垂直堆积条形图
+barplot(cyl.freq.matrix,beside = TRUE, #不堆积显示#
+        horiz=TRUE, #水平显示#
+        las=1, #坐标轴文字方向#
+        main = "Performance car counts\nby transmission and cylinders", #添加标题#
+        names.arg = c("V4","V6","V8"), #改变量名#
+        legend.text = c("auto","manual"), #图例文字#
+        args.legend = list(x="bottomright") #图例位置#
+) #以上8行，演示plot绘制完整的水平分列条形图
+
+library(ggplot2)
+qplot(factor(mtcars$cyl),geom = "bar") #以上2行，绘制垂直条形图，注意：必须先形成因子变量factor
+
+qplot(factor(mtcars$cyl),geom = "blank",fill=factor(mtcars$am), #根据fill来分割列#
+      xlab = "",ylab = "",main = "Performance car counts\nby transmission and cylinders" #添加标题#
+) + geom_bar(position = "dodge" #注意：+号不能单独一行#
+) + scale_x_discrete(labels=c("V4","V6","V8") #添加x轴离散变量标签#
+) + scale_y_continuous(breaks = seq(from=0,to=12,by=2) #添加y轴连续变量标签#
+) + theme_bw(  #主体背景黑白#
+) + coord_flip(  #旋转形成水平条形图，注意：先scale！后旋转#
+) + scale_fill_grey(name="Trans.",labels=c("auto","manual") #图例填充，改为黑白/灰度双色，改了图例说明文字#
+) #以上9行，演示qplot绘制完整的水平分列条形图#
+
+#######################
+### 14.1.2 饼图简介
+#######################
+pie(table(mtcars$cyl),
+    labels = c("V4","V6","V8"),
+    col = c("white","grey","black"),
+    main = "Performance cars by cylinders"
+) #以上5行，绘制单一变量的饼图
+
+#######################
+## 14.2直方图
+#######################
+#条形图用于类别变量、直方图用于连续型数值变量
+mtcars$hp
+hist(mtcars$hp) #以上2行，绘制默认格式的直方图
+hist(mtcars$hp,breaks = seq(from = 0,to = 400, by= 25),
+     col="turquoise",main="Horsepower",xlab = "HP" 
+) #以上3行，绘制0-400间隔为25的直方图
+abline(v=c(mean(mtcars$hp),median(mtcars$hp)),lty=c(2,3),lwd=2) #以上1行，添加2条垂直的均数和中位数线
+legend("topright",legend = c("mean HP","median HP"),lty=c(2,3),lwd=2) #以上1行，添加图例
+hist(mtcars$hp,breaks = "Sturges",
+     col="magenta",main="Horsepower",xlab = "HP" 
+) #以上3行，利用Sturges经验公式数据驱动算法自动绘制间隔的直方图
+library(ggplot2)
+qplot(mtcars$hp)
+
+qplot(mtcars$hp,geom = "blank",main = "Horsepower",xlab = "HP"
+)+ geom_histogram(color="turquoise",fill="magenta", #边框与填充色#
+                  breaks=seq(from=0,to=400,by=25),closed="right"
+)+ geom_vline(mapping = aes(xintercept=c(mean(mtcars$hp),median(mtcars$hp)),
+                            linetype=factor(c("mean","median"))),
+              show.legend = TRUE 
+)+ scale_linetype_manual(values = c(2,3))+ labs(linetype="" ) #画线型，同时禁止自动包含手动添加的图例的标题#
+#以上7行，ggplot2绘制直方图
+
+#######################
+## 14.3 箱线图
+#######################
+### 14.3.1 独立箱线图
+library(datasets)
+data(quakes)
+hist(quakes$mag)
+boxplot(quakes$mag) #以上1行，绘制了独立箱线图，1.5倍IQR以上的观测值被range=1.5默认定义为异常值
+
+### 14.3.2 并列箱线图
+stations.fac <- cut(quakes$stations,breaks = c(0,50,100,150)) #以上1行，先切割quakes$stations成为分类变量
+stations.fac[1:5] #以上1行，显示新分类变量的第1-第5个
+boxplot(quakes$mag~stations.fac) #以上1行，绘制了并列箱线图
+boxplot(quakes$mag~stations.fac,xlab = "# stations detected",ylab = "Magnitude",col="Magenta") #以上1行，绘制了并列箱线图
+library(ggplot2)
+qplot(stations.fac,quakes$mag,geom = "boxplot",
+      xlab = "# stations detected",ylab = "Magnitude") #以上2行，ggplot2绘制箱线图
+
+#######################
+## 14.4散点图
+#######################
+#单一散点图用于2个连续型数值变量的比较
+library(datasets)
+data(iris)
+?iris
+iris[1:5,] #查看iris数据集的前5条
+### 14.4.1 单一散点图
+plot(iris[,4],iris[,3],type = "n", #先画出总体的正确维数区域#
+     xlab="Petal Width (cm)",ylab="Petal Length (cm)")
+points(iris[iris$Species=="setosa",4],
+       iris[iris$Species=="setosa",3],pch=19,col="navyblue")
+points(iris[iris$Species=="virginica",4],
+       iris[iris$Species=="virginica",3],pch=17,col="magenta")
+points(iris[iris$Species=="versicolor",4],
+       iris[iris$Species=="versicolor",3],pch=1,col="turquoise")
+legend("topleft",legend = c("setosa","virginica","versicolor"),
+       col=c("navyblue","magenta","turquoise"),pch = c(19,17,1)
+) #以上11行，实际上是涂出了散点图
+iris_pch <- rep(19,nrow(iris))
+iris_pch[iris$Species=="versicolor"] <-1 #以上2行，将1赋值到versicolor杂色中
+iris_col <- rep("black",nrow(iris))
+iris_col[iris$Species=="virginica"] <-"gray"  #以上2行，将灰色赋值到virginica花中
+plot(iris[,4],iris[,3],col=iris_col,pch=iris_pch,
+     xlab="Petal Width (cm)",ylab="Petal Length (cm)") #以上6行，绘制了散点图
+
+library(ggplot2)
+qplot(iris[,4],iris[,3],shape=iris$Species,
+      xlab = "Petal Width",ylab = "Petal length"
+)+ scale_shape_manual(values = 4:6  #手工调整形状#
+)+ labs(shape="Species") #以上5行，绘制单色不同形状的单一散点图
+library(ggplot2)
+qplot(iris[,4],iris[,3],shape=iris$Species,color=iris$Species, #调整了形状和颜色#
+      xlab = "Petal Width",ylab = "Petal length"
+)+ scale_shape_manual(values = 4:6 #手工调整形状#
+)+ labs(shape="Species",color="Species") #调整了形状和颜色，所以图例也要2个同步改#
+#以上5行，绘制不同颜色的单一散点图
+
+### 14.4.2 散点图矩阵
+#散点图矩阵用于2个以上连续型数值变量
+pairs(iris[,1:4],pch=iris_pch,col=iris_col,cex=0.75) #以上1行，利用之前创建的iris_pch和iris_col区别了物种
+pairs(iris[,1:4],pch=iris_pch,col=iris_col,cex=0.75,lower.panel = NULL)
+pairs(iris[,1:4],pch=iris_pch,col=iris_col,cex=0.75,upper.panel = NULL) #以上2行，仅显示对角线的一侧
+install.packages("GGally")
+library(ggplot2)
+library(GGally)
+ggpairs(iris,mapping = aes(col=Species))
+ggpairs(iris,mapping = aes(col=Species),axisLabels = "internal") #以上5行，绘制了ggally包加载在ggplot2上后的散点矩阵，同时给出了相关系数
+
+#######################
+#练习14.1
+#######################
+library(datasets)
+data("InsectSprays")
+?InsectSprays
+hist(InsectSprays$count)
+hist(InsectSprays$count,breaks = "Sturges")
+insect.freq <- tapply(InsectSprays$count, INDEX = InsectSprays$spray, FUN = sum)
+insect.freq
+barplot(insect.freq,
+        col = c("white","grey","black","red","green","blue"),
+        main = "Performance"
+)
+pie(insect.freq,
+    labels = c("A","B","C","D","E","F"),
+    col = c("white","grey","black","red","green","blue"),
+    main = "Performance")
+library(ggplot2)
+qplot(InsectSprays$spray,InsectSprays$count,geom = "boxplot",
+      xlab = "spray type",ylab = "Insect count")
+library(datasets)
+data("USArrests")
+?USArrests
+library(ggplot2)
+qplot(USArrests$UrbanPop,geom = "blank",main = "Urban population USA",xlab = "Urbanpop"
+)+ geom_histogram(color="turquoise",fill="magenta", #边框与填充色#
+                  breaks=seq(from=0,to=100,by=10),closed="right"
+)+ geom_vline(mapping = aes(
+  xintercept=c(quantile(USArrests$UrbanPop,prob = c(0.25)),median(USArrests$UrbanPop),quantile(USArrests$UrbanPop,prob = c(0.75))),
+  linetype=factor(c("1st Q","median","3rd Q"))),show.legend = TRUE 
+)+ scale_linetype_manual(values = c(3:5))+ labs(linetype="" ) #画线型，同时禁止自动包含手动添加的图例的标题#
+View("USArrests")
+USarst <- t(as.matrix(USArrests[,-3]))
+USarst
+barplot(USarst,beside = FALSE, #堆积显示#
+        horiz=TRUE, #垂直显示#
+        las=1, #坐标轴文字方向#
+        main = "US STATE CRIMES", #添加标题#
+        names.arg = state.abb, #改变量名#
+        legend.text = c("Murder","Assault","Rape"), #图例文字#
+        args.legend = list(x="bottomright") #图例位置#
+) #以上8行，演示plot绘制完整的水平分列条形图
+
+median(USArrests$UrbanPop)
+urbancat <- c(rep(x=0,times=length(USArrests$UrbanPop)))
+urbancat
+urbancat[USArrests$UrbanPop > median(USArrests$UrbanPop)] <-1
+urbancat <-factor(urbancat)
+USARrests <- data.frame(USArrests[,-3],urbancat)
+USARrests[1:3,]
+library(ggplot2)
+library(GGally)
+ggpairs(USARrests,mapping = aes(col=USARrests$urbancat))
+ggpairs(USARrests,mapping = aes(col=USARrests$urbancat),axisLabels = "internal") #以上5行，绘制了ggally包加载在ggplot2上后的散点矩阵，同时给出了相关系数
+
+quakes[1:3,]
+lab <- c("LOW","Medium","HIGH")
+mag.fac <- cut(x=quakes$mag,
+               breaks = quantile(quakes$mag,prob = c(0,1/3,2/3,1)),
+               right = FALSE,include.lowest = TRUE,labels=lab
+)
+mag.fac
+library(ggplot2)
+qplot(quakes[,2],quakes[,1],shape=mag.fac,color=mag.fac, #调整了形状和颜色#
+      xlab = "Longitude",ylab = "Latitude"
+)+ scale_shape_manual(values = 1:3 #手工调整形状#
+)+ labs(shape="mag.fac",color="mag.fac") #调整了形状和颜色，所以图例也要2个同步改#
+plot(quakes[,2],quakes[,1],pch=(1:3)[mag.fac],xlab="Longitude",ylab="Latitude")
+legend("bottomleft",legend=levels(mag.fac),pch=1:3)
+#以上2行，完成了单一颜色散点图
+myquakes <- data.frame(quakes,mag.fac)
+myquakes
+plot(myquakes[,2],myquakes[,1],type = "n", #先画出总体的正确维数区域#
+     xlab="Longitude",ylab="Latitude")
+points(myquakes[myquakes$mag.fac=="LOW",2],
+       myquakes[myquakes$mag.fac=="LOW",1],pch=1,col="navyblue")
+points(myquakes[myquakes$mag.fac=="Medium",2],
+       myquakes[myquakes$mag.fac=="Medium",1],pch=2,col="magenta")
+points(myquakes[myquakes$mag.fac=="HIGH",2],
+       myquakes[myquakes$mag.fac=="HIGH",1],pch=3,col="turquoise")
+legend("bottomleft",legend = c("LOW","Medium","HIGH"),
+       col=c("navyblue","magenta","turquoise"),pch = c(1,2,3)
+) #以上11行，实际上是涂出了散点图
+
+#######################
+# 15概率
+## 15.1 什么是概率
+#######################
+### 15.1.1 事件和概率
+### 15.1.2 条件概率
+### 15.1.3 交集
+(2/3)*(1/2)
+### 15.1.4 并集
+(1/2)+(1/2)-(1/3)
+### 15.1.5 补集
+
+## 练习15.1
+#(a)
+4/52 # Pr(Ace)
+1/52 # Pr(4 of spades)
+#(b)
+13/52 # Pr(A|B)==Pr(A), so the two events are independent
+#(c)
+13/52 # Pr(A)
+13/51 # Pr(A|B)  Pr(A|B)!=Pr(A), so the two events are no longer independent
+#(d)
+12/52 # Pr(C)
+26/52 # Pr(D)
+6/52 # Pr(C and D) = Pr(C|D)*Pr(D) = (6/26)*(26/52) = 6/52 != 0 therefore C and D are not mutually exclusive
+
+#######################
+## 15.2 随机变量和概率分布
+### 15.2.1 观察值
+### 15.2.2离散随机变量（概率质量函数）
+#######################
+X.outcomes <- c(-4,0,1,8)
+X.prob <- c(0.32,0.48,0.15,0.05)
+barplot(X.prob,space = 0 #每个条形图直接不分离#
+        ,names.arg=X.outcomes  #X轴的标签名#
+        ,ylim=c(0,0.5) #Y轴最小值与最大值#
+        ,xlab = "x", ylab = "Pr(X=x)"
+)#以上7行，绘制离散随机变量的概率质量函数分布
+X.cumul <- cumsum(X.prob)
+X.cumul #以上2行，使用cumsum进行累加，得到累积概率#
+barplot(X.cumul,space = 0 #每个条形图直接不分离#
+        ,names.arg=X.outcomes  #X轴的标签名#
+        ,ylim=c(0,1) #Y轴最小值与最大值#
+        ,xlab = "x", ylab = "Pr(X<=x)"
+)#以上7行，绘制离散随机变量的累积概率
+mu.X <- sum(X.outcomes*X.prob)
+mu.X
+var.X <- sum((X.outcomes-mu.X)^2*X.prob)
+var.X
+sd.X <- sqrt(var.X)
+sd.X
+
+#######################
+### 15.2.3 连续随机变量（概率密度函数）
+#######################
+w <- seq(from=35,to=95,by=5)
+w
+lower.w <- (w>=40 & w<=65)
+lower.w
+upper.w <- (w>65 & w<=90)
+upper.w
+fw <- rep(x=0,length(w))
+fw[lower.w] <- (w[lower.w]-40)/625
+fw[upper.w] <- (90-w[upper.w])/625
+fw #以上10行，列出概率密度函数
+plot(w,fw,type = "l",ylab = "f(w)")
+abline(h=0,col="magenta",lty=2) #以上2行，画出概率密度函数图形
+fw.specific <- (55.2-40)/625
+fw.specific
+fw.specific.area <- 0.5*15.2*fw.specific
+fw.specific.area #以上4行，用几何方法计算概率值
+fw.specific.vertices <- rbind(c(40,0),c(55.2,0),c(55.2,fw.specific))
+fw.specific.vertices
+plot(w,fw,type = "l",ylab = "f(w)")
+abline(h=0,col="magenta",lty=2)
+polygon(fw.specific.vertices,col="navyblue",border = NA)
+abline(v=55.2,col="turquoise",lty=4)
+text(50,0.005,labels=fw.specific.area,col="white") #以上7行，绘制了多边形显示概率密度
+Fw <- rep(x=0,length(w))
+Fw[lower.w] <- (w[lower.w]^2-80*w[lower.w]+1600)/1250
+Fw[upper.w] <- (180*w[upper.w]-w[upper.w]^2-6850)/1250
+Fw[w>90] <- 1
+plot(w,Fw,type = "l",ylab = "F(w)")
+abline(h=c(0,1),col="magenta",lty=2)
+abline(v=55.2,col="turquoise",lty=3)
+abline(h=fw.specific.area,col="coral",lty=4)#以上8行，绘制了概率密度函数的累积概率分布
+plot(w,w*fw,type = "l",ylab = "wf(w)") #以上1行，绘制均值的曲线
+plot(w,(w-65)^2*fw,type = "l",ylab = "(w-65)^2 f(w)") #以上1行，绘制了方差的曲线
+sqrt(104.1667)
+
+### 15.2.4 形状、偏态和峰态
+#######################
+## 练习 15.2
+#######################
+#i 随机变量观测值，离散变量
+#ii 随机变量，离散变量
+#iii随机变量，离散
+#iiiv 随机变量，连续
+#v 随机变量观察值，离散
+#vi 随机变量，连续
+Prs4 <- 1-0.1-0.13-0.21-0.15
+Prs4
+X.prob <- c(0.1,0.13,0.21,Prs4,0.15)
+X.prob
+X.outcomes <- c(1,2,3,4,5)
+X.outcomes
+X.cumul <- cumsum(X.prob)
+X.cumul
+mu.X <- sum(X.outcomes*X.prob)
+mu.X
+var.X <- sum((X.outcomes-mu.X)^2*X.prob)
+var.X
+sd.X <- sqrt(var.X)
+sd.X
+sum(X.prob[3:5])
+barplot(X.prob,space = 0 #每个条形图直接不分离#
+        ,names.arg=X.outcomes  #X轴的标签名#
+        ,ylim=c(0,0.5) #Y轴最小值与最大值#
+        ,xlab = "x", ylab = "Pr(X=x)"
+)#以上7行，绘制离散随机变量的概率质量函数分布
+#d.对称，双峰
+#不对称，三峰，右偏
+#对称，单峰
+#不对称，单峰，右偏
+
+
+#######################
+# 第五部分 高级绘图
+# 23 自定义高级绘图
+#######################
+#######################
+## 23.1 掌握图形设备
+#######################
+### 23.1.1 手动打开新设备
+?Devices
+plot(quakes$long,quakes$lat)
+dev.new()
+hist(quakes$stations,breaks = "Sturges") #以上3行，调出了新的图形设备窗口，可有2个以上窗口同时查看图形
+
+### 23.1.2 在设备之间切换
+dev.set(3)
+plot(quakes$long,quakes$lat,cex=0.02*quakes$stations,
+     xlab="Longitude",ylab = "Latitude") #以上3行，调用某一已有图形窗口之一进修修改
+dev.set(4)
+abline(v=mean(quakes$stations),lty=2) #以上2行，调出某一已有图形窗口，增加了绘制的内容
+
+### 23.1.3 关闭一个设备
+dev.off(3) #以上1行，关闭某一已有图形窗口，关闭后输出结果会告诉我们关闭设备后新的活动窗口是什么
+dev.off() #以上1行，关闭所有已有图形窗口，关闭后输出结果会告诉我们关闭设备后新的活动窗口是什么
+
+#######################
+### 23.1.4 一个设备中多个图形
+#######################
+dev.new(width=8,height=4) #以英寸为单位
+par(mfrow=c(1,2)) #图形在1行中，放2个
+plot(quakes$long,quakes$lat,cex=0.02*quakes$stations,
+     xlab="Longitude",ylab = "Latitude")
+hist(quakes$stations,breaks = "Sturges")
+abline(v=mean(quakes$stations),lty=2) #以上6行，在1个图形窗口绘制了2个图形,注意：一定要关闭所有图形设备，否则图形会被压扁！
+
+dev.new(width=4,height=8) #以英寸为单位
+par(mfrow=c(2,1)) #图形在2行中，各放1个
+plot(quakes$long,quakes$lat,cex=0.02*quakes$stations,
+     xlab="Longitude",ylab = "Latitude")
+hist(quakes$stations,breaks = "Sturges")
+abline(v=mean(quakes$stations),lty=2) #以上6行，在1个图形窗口绘制了2个图形,注意：一定要关闭所有图形设备，否则默认打开7in*7in的图形
+dev.off()
+
+lay.mat <- matrix(c(1,3,2,3),2,2)
+lay.mat #以上2行，先设立1个矩阵
+layout(mat=lay.mat) #以上1行，锁定奇数图形在1个图形窗口内的位置
+layout.show(n=max(lay.mat)) #以上1行，显示layout的图形效果
+library("MASS")
+plot(survey$Wr.Hnd,survey$Height,
+     xlab = "Writing handspan",ylab = "Height")
+boxplot(survey$Height~survey$Smoke)
+barplot(table(survey$Exer),horiz = TRUE,main = "Exercise") #以上8行，在1个图形窗口容纳奇数个图形
+
+#######################
+## 23.2 绘制区域和边距
+#######################
+### 23.2.1 默认间距
+par()$oma #显示默认外边界out margin area多少行
+par()$mar #显示默认图边界 默认c(bottom,left,top,right)多少行
+plot(1:10)
+box(which="figure",lty=2) #以上2行，实线框内为绘图区域，实线与虚线之间为图形区域mar，虚线外为外部区域oma#
+### 23.2.2 自定义间距
+par(oma=c(1,4,3,2),mar=4:7)
+plot(1:10)
+box("figure",lty=2)
+box("outer",lty=3) #以上4行，设置外边界和图边界
+mtext("Figure region margins\nmar[ . ]",line=2,side=4) #line决定位置，side放在那一侧
+mtext("Outer region margins\noma[ . ]",line=0.5,outer = TRUE) #以上2行，添加绘图区外的文字
+#######################
+### 23.2.3 剪切
+#######################
+dev.off()
+dev.new()
+par(oma=c(1,1,5,1),mar=c(2,4,5,4))
+boxplot(mtcars$mpg~mtcars$cyl,xaxt="n",ylab="MPG") #不显示水平轴
+box("figure",lty=2)
+box("outer",lty=4)
+arrows(x0=c(2,2.5,3),y0=c(44,37,27),x1=c(1.25,2.25,3),y1=c(31,22,20),xpd=FALSE)
+text(x=c(2,2.5,3),y=c(45,38,28),c("V4 cars","V6 cars","V8 cars"),xpd=FALSE)
+#以上8行，演示了xpd设置为F的情况下，绘图区范围外不会显示
+par(oma=c(1,1,5,1),mar=c(2,4,5,4))
+boxplot(mtcars$mpg~mtcars$cyl,xaxt="n",ylab="MPG") #不显示水平轴
+box("figure",lty=2)
+box("outer",lty=4)
+arrows(x0=c(2,2.5,3),y0=c(44,37,27),x1=c(1.25,2.25,3),y1=c(31,22,20),xpd=TRUE)
+text(x=c(2,2.5,3),y=c(45,38,28),c("V4 cars","V6 cars","V8 cars"),xpd=TRUE)
+#以上6行，演示了xpd设置为T的情况下，图形区内均显示
+par(oma=c(1,1,5,1),mar=c(2,4,5,4))
+boxplot(mtcars$mpg~mtcars$cyl,xaxt="n",ylab="MPG") #不显示水平轴
+box("figure",lty=2)
+box("outer",lty=4)
+arrows(x0=c(2,2.5,3),y0=c(44,37,27),x1=c(1.25,2.25,3),y1=c(31,22,20),xpd=NA)
+text(x=c(2,2.5,3),y=c(45,38,28),c("V4 cars","V6 cars","V8 cars"),xpd=NA)
+#以上6行，演示了xpd设置为NA的情况下，绘图区范围外均显示
+
+#######################
+## 23.3 点击式坐标互动
+### 23.3.1 获取坐标
+#######################
+plot(1,1)
+locator() #以上2行，运行后鼠标左键点击，然后右键停止可获取鼠标点击坐标
+
+### 23.3.2 可视化所选坐标
+plot(1,1)
+Rtist <- locator(type = "o",pch=4,lty=2,lwd=3,col="red",xpd=TRUE)
+Rtist #以上3行，演示手动来绘制折线！且可获取整个图形区域内的坐标
+
+### 23.3.3 专用注释
+library("MASS")
+data("survey")
+dev.new()
+plot(survey$Height~survey$Wr.Hnd,pch=16,col=c("magenta","turquoise")[as.numeric(survey$Sex)],
+     xlab="Writing handspan",ylab = "Height")
+legend(locator(n=1),legend = levels(survey$Sex),pch = 16,col = c("magenta","turquoise"),xpd=TRUE)
+#以上6行演示，在绘图区范围外，用鼠标点击确认图例位置（n默认值512）
+#######################
+## 练习 23.1
+#######################
+dev.off()
+dev.new()
+par(mfrow=c(1,2))
+boxplot(mtcars$mpg~mtcars$cyl,xlab="Cylinders",ylab = "MPG")
+carfit <- lm(mpg~cyl,data=mtcars) #lm拟合线性模型
+plot(mtcars$mpg~mtcars$cyl,xlab="Cylinders",ylab = "MPG")
+abline(carfit,lwd=2)
+
+dev.new(width=4,height=4) #以英寸为单位
+lay.mat <- matrix(c(2,1,3),3,3)
+lay.mat #以上2行，先设立1个矩阵
+layout(mat=lay.mat) #以上1行，锁定奇数图形在1个图形窗口内的位置
+layout.show(n=max(lay.mat)) #以上1行，显示layout的图形效果
+
+dev.new(width=4,height=4) #以英寸为单位
+lay.mat <- matrix(c(1,1,2,4,3,5),2,3)
+lay.mat #以上2行，先设立1个矩阵
+layout(mat=lay.mat) #以上1行，锁定奇数图形在1个图形窗口内的位置
+layout.show(n=max(lay.mat)) #以上1行，显示layout的图形效果
+
+dev.new(width=4,height=4) #以英寸为单位
+lay.mat <- matrix(c(2,3,3,1,2,4,5,1),4,2)
+lay.mat #以上2行，先设立1个矩阵
+layout(mat=lay.mat) #以上1行，锁定奇数图形在1个图形窗口内的位置
+layout.show(n=max(lay.mat)) #以上1行，显示layout的图形效果
+
+dev.off()
+dev.set(3)
+dev.new(width=9,height=4.5) #以英寸为单位
+lay.mat <- cbind(c(1,1),c(1,1),c(2,3),c(4,4))
+lay.mat #以上2行，先设立1个矩阵
+layout(mat=lay.mat) #以上1行，锁定奇数图形在1个图形窗口内的位置
+layout.show(n=max(lay.mat)) #以上1行，显示layout的图形效果
+par(mar=c(4,4,2,1))
+plot(quakes$long,quakes$lat,cex=0.02*quakes$stations,
+     xlab = "Longitude",ylab = "Latitude")
+box(which="figure",col="gray")
+plot(quakes$mag,quakes$stations,
+     xlab = "Magnitude",ylab = "Stations")
+box(which="figure",col="gray")
+plot(quakes$depth,quakes$stations,
+     xlab = "Depth",ylab = "Stations")
+box(which="figure",col="gray")
+hist(quakes$stations,xlab = "Stations")
+abline(v=mean(quakes$stations),lty=2)
+box(which="figure",col="gray")
+
+#######################
+## 23.4 自定义传统R图形
+#######################
+### 23.4.1 样式和禁止的图形参数
+dev.off()
+hp <- mtcars$hp
+mpg <- mtcars$mpg
+wtcex <- mtcars$wt/mean(mtcars$wt)
+plot(hp,mpg,cex=wtcex,xaxs="r",yaxs="r") #以上5行，展示与X轴、Y轴无交集
+plot(hp,mpg,cex=wtcex,xaxs="i",yaxs="i") #以上6行，展示与X轴、Y轴交集Intersection，功能类同于Xlim/ylim
+plot(hp,mpg,cex=wtcex,xaxt="n",yaxt="n",bty="n",xlab="",ylab="") 
+plot(hp,mpg,cex=wtcex,xaxt="n",axes=FALSE,ann = FALSE) #以上2行，作用相同均为去除所有的轴与附加内容 
+### 23.4.2 自定义边框
+box(bty="]",lty = 3,lwd=2,col="magenta") #以上2行，演示添加外框O/L/7/C/U/]等形状
+#######################
+### 23.4.3 自定义坐标轴
+#######################
+hpseq <- seq(min(hp),max(hp),length=10)
+plot(hp,mpg,cex=wtcex,xaxt="n",bty="n",ann=FALSE) #以上1行，把轴去掉了
+axis(side=1,at=hpseq) #以上1行，添加了底边的轴
+axis(side=3,at=round(hpseq)) #以上1行，添加了顶部的轴
+#一定先确定边框样式，后坐标轴
+hpseq2<-seq(50,325,by=25)
+plot(hp,mpg,cex=wtcex,axes=FALSE)
+box(bty="l") #以上1行，画出L形的外框
+axis(side = 2,tcl=-1,las=3,mgp=c(3,2.5,0)) #tcl标记的长度，las标签方向,mgp轴间距mgp=c(axis title, axis labels, axis line)
+axis(side = 1,at= hpseq2, tcl=1.5,las=3,mgp=c(3,1.5,1)) #tcl标记的长度，las标签方向,mgp轴间距
+#######################
+## 23.5 专用文本和标签符号
+### 23.5.1 字体
+#######################
+par(mar=c(3,3,3,3))
+plot(1,1,type="n",xlim = c(-1,1),ylim = c(0,7),xaxt="n",yaxt="n",ann=FALSE)
+text(0,6,label = "sans text (default)\nfamily=\"sans\",font=1")
+text(0,5,label = "serif text \nfamily=\"serif\",font=1",family="serif",font = 1)
+text(0,4,label = "mono text \nfamily=\"mono\",font=1",family="mono",font = 1)
+text(0,3,label = "mono text (bold, italic) \nfamily=\"mono\",font=4",family="mono",font = 4)
+text(0,2,label = "sans text (italic) \nfamily=\"sans\",font=3",family="sans",font = 3)
+text(0,1,label = "serif text (bold) \nfamily=\"serif\",font=2",family="serif",font = 2)
+mtext("some",line=1,at=-0.5,cex = 2,family="sans")
+mtext("different",line=1,at=0,cex = 2,family="serif")
+mtext("fonts",line=1,at=0.5,cex = 2,family="mono") #以上10行，绘制了一个X轴-1到1，Y轴0到7的空图，然后写入各种字体
+#######################
+### 23.5.2 希腊字符
+#######################
+par(mar=c(3,3,3,3))
+plot(1,1,type="n",xlim = c(-1,1),ylim = c(0.5,4.5),xaxt="n",yaxt="n",ann=FALSE)
+text(0,4,label = expression(alpha),cex=1.5)
+text(0,3,label = expression(paste("sigma: ",sigma," SIGMA:",Sigma)),family="mono",cex=1.5)
+text(0,2,label = expression(paste(beta," ",gamma,"",Phi)),cex=1.5)
+text(0,1,label = expression(paste(Gamma,"( ",tau,")= 24 when ",tau," =5")),family= "serif", cex=1.5)
+title(main=expression(paste("Gr",epsilon,epsilon,"k")),cex.main=2) #以上7行，显示希腊字母，注意希腊字母与标准字母混排，需要用paste连接
+# 可控制cex.lab，使用不同的标签cex.main区分主标题和轴标题大小
+#######################
+### 23.5.3 数学表达式
+#######################
+expr1 <- expression(c^2==a[1]^2+b[1]^2)
+expr2 <- expression(paste(pi^{x[i]},(1-pi)^(n-x[i])))
+expr3 <- expression(paste("Sample mean: ",
+                          italic(n)^{-1},
+                          sum(italic(x)[italic(i)],
+                              italic(i)==1,
+                              italic(n))
+                          ==frac(italic(x)[1]+...+italic(x)[italic(n)],italic(n))
+))
+expr4 <- expression(paste("f(x","|",alpha,",",beta,")"
+                          ==frac(x^{alpha-1}~(1-x)^{beta-1},
+                                 B(alpha,beta)
+                          )))
+par(mar=c(3,3,3,3))
+plot(1,1,type="n",xlim = c(-1,1),ylim = c(0.5,4.5),xaxt="n",yaxt="n",ann=FALSE)
+text(0,4:1,labels = c(expr1,expr2,expr3,expr4),cex=1.5)
+title(main="Math",cex.main=2)
+#以上17行显示，数学表达式必须先定义为对象，才能画图
+?plotmath
+demo(plotmath)
+#以上2行，用于显示更多数学公式语法
+#######################
+## 23.6 完全注释的散点图
+#######################
+hp <- mtcars$hp
+mpg <- mtcars$mpg
+wtcex <- mtcars$wt/mean(mtcars$wt)
+hpseq2 <- seq(50,325,by=25) #以上4行，用于缩短命令行
+dev.new()
+par(mar=c(5,4,4,4))
+plot(hp,mpg,cex=wtcex,axes = FALSE,ann= FALSE)
+box(bty="u")
+axis(2,las=1,tcl=-0.8,family="mono") #画Y轴的标线，坐标轴文字方向=1,#
+axis(1,at=hpseq2,labels= FALSE,tcl=-1,family="sans") #labels=FALSE隐藏了X轴的标签#
+L100 <- seq(22,7,by=-3)
+MPG.L100 <- (100/L100*3.78541)/1.609 #以上2行，将MPG转换为公制
+axis(4,at=MPG.L100,labels = L100,las=1,tcl=0.3,mgp=c(3,0.3,0),family="mono") #mgp是轴间距#
+express.L100 <- expression(paste(L/100,"km"%~~%frac(378.541,1.609%*%MPG)))
+title(main = "MPG by Horsepower", xlab = "Horsepower", ylab = "MPG", family="serif")
+mtext(express.L100,side=4,line=3,family="serif")
+text(hpseq2,rep(7.5,length(hpseq2)),labels = hpseq2,srt=45,xpd=TRUE,family="mono") #7.5是一行一行测试出来的，srt用于旋转文字方向
+grid(col="turquoise",lty=2) #网格颜色和线型，nx和ny可指定沿x和y轴的单元格数量，默认为沿刻度绘制网格线
+legend(250,30,legend = rep("        ",3),pch = rep(1,3),pt.cex=c(1.5,1,0.5)) #以上1行，手动在(250，30)上绘制图例
+arrows(265,27,265,29,length=0.05) #以上1行，手动绘制箭头
+text(locator(1),labels= "Weight",cex=0.8,family="serif") #以上1行，通过交互定位器手动确定Weight文本位置
+#######################
+## 练习 23.2
+#######################
+dia.url <- "http://jse.amstat.org/v9n2/4Cdata.txt"
+diamonds <- read.table(dia.url)
+names(diamonds) <- c("Carat","Color","Clarity","Cert","Price")
+dev.off()
+dev.new(width=6,height=6)
+par(mar=c(0,4,2,0))
+boxplot(diamonds$Price~diamonds$Cert,ylab="",axes=FALSE,frame=FALSE,
+        main="Diamond Prices by Certification",cex=1.8,family="sans") #以上1行，绘制了独立箱线图，1.5倍IQR以上的观测值被range=1.5默认定义为异常值
+seq2<-seq(0,18000,by=2000)
+axis(side = 2,at= seq2, tcl=1,las=1,mgp=c(3,0.5,0)) #tcl标记的长度，las标签方向,mgp轴间距
+text(locator(1),labels = "SGD$",xpd=TRUE) #xpd是在画图区外也显示
+text(locator(1),labels= "GIA",cex=1.8,family="sans") #以上1行，通过交互定位器手动确定Weight文本位置
+text(locator(1),labels= "HRD",cex=1.8,family="sans") #以上1行，通过交互定位器手动确定Weight文本位置
+text(locator(1),labels= "IGI",cex=1.8,family="sans") #以上1行，通过交互定位器手动确定Weight文本位置
+#以上14行，完成
+dev.off() #
+dev.new() #
+dev.new(width=8,height=7) #以英寸为单位
+par(mar=c(2,5,3,5),oma=c(0,1,1,1)) #显示默认图边界 默认c(bottom,left,top,right)多少行
+plot(diamonds$Carat,diamonds$Price,col=c("red","green","blue"),axes=FALSE,ann = FALSE)
+box(bty="U",lty = 3,lwd=2,col="magenta") #以上2行，演示添加外框O/L/7/C/U/]等形状
+xseq <- seq(0.2,1.1,by=0.1)
+axis(side=1,at=xseq,family="sans") #以上1行，添加了底边的轴
+yseq <- seq(1000,17000,by=2000)
+axis(side=2,at=yseq,las=1,family="sans") #以上1行，添加了底边的轴
+
+
+
+##########################################################
+#
+#R语言数据操作 Data Manipulation with R
+#Phil Spector著
+#ISBN 978-7-5605-3873-0
+#庞成批注：在入门的基础上，这本书适合深入学习数据操作技巧
+##########################################################
+
+#作者推荐的是先检查数据对象的类型，再根据类型不同进行不同的数据导入操作
+
+#第1章 R中的数据
+## 1.1 模式mode和类class
+foo <- matrix(data=1:9,nrow = 3,ncol = 3)
+foo
+attributes(foo) #以上3行，演示了如何展示属性
+attr(x=foo,which = "dim")
+dim(foo)
+mode(foo) #以上1行，mode函数展示R对象的模式，最常见的单个对象模式是数值、字符、逻辑值#
+class(foo) #以上1行，class函数展示R对象的类#
+typeof(foo)#以上1行，提供对象类型的额外信息
+
+mylist <- list(a=c(1,2,3),b=c("cat","dog","duck"),d=factor("a","b","a"))
+sapply(mylist, mode) 
+sapply(mylist, class) #以上3行，展示了factor变量在mode和class定义是不一样的，factor变量实际是按照在R中按照数值numeric进行存储的#
+# lapply : 遍历list列表向量内的每个元素，并且使用指定函数来对其元素进行处理。返回列表向量。
+# sapply : 与lapply基本相同，只是对返回结果进行了简化，返回的是普通的向量。
+# mapply : 支持传入两个以上的列表。  
+# tapply: 接入参数INDEX，对数据分组进行运算，就和SQL中的by group一样。
+
+
+## 1.2 R的数据存储
+###最基本多个数值存储方式：向量vector
+x <- c(1,2,5,10)
+mode(x)
+
+y <- c(1,2,"cat",3)
+mode(y) #数值与字符混在一起，默认转化为字符
+
+z <- c(5,TRUE,3,7)
+mode(z) #逻辑值与数值混在一起，默认转化为数值
+
+all <- c(x,y,z)
+all # c函数还可以直接合并向量
+
+x <- c(one=1,two=2,three=3)
+x #以上2行，直接给向量内的元素指定名称
+
+x <- c(1,2,3)
+names(x) <- c('one','two','three')
+x #以上3行，通过names后指定元素的名称
+
+names(x)[1:2]=c('uno','dos')
+x #以上2行，通过names用作索引，修改元素名称
+
+rnorm(100,3,4) #以上1行，产生100个均值是3，标准差为4的随机数
+
+norm <- rnorm(15) #产生15个服从正态分布的随机数
+rmat <- matrix(norm,5,3,dimnames = list(NULL,c('A','B','C')))
+rmat #以上3行，产生一个5*3的矩阵，存储15个随机数
+
+dimnames(rmat)= list(NULL,c('A1','B1','C1'))
+rmat #以上1行，展示先建立矩阵，后单独对其行、列指定名称
+
+mylist <- list(c(1,4,6),"dog",3,"cat",TRUE,c(9,10,11))
+mode(mylist)
+sapply(mylist, mode) #以上3行，显示list内各对象的mode不同
+
+mylist <- list(first=c(1,3,5),second=c('one','three','five'),third="end") #单引号和双引号的区别？没区别完全等价，只在转义\时显示的区别。双引号里面不能有双引号，单引号里面不能有单引号。
+mylist
+names(mylist) <- c('first1','second1','third1')
+mylist #以上4行，展示list的2种不同的元素命名方法
+
+## 1.3 模式与类的检测
+is.list(x)
+is.factor(x)
+is.numeric(x)
+is.data.frame(x)
+is.character(x)
+#以上5行，展示如何检测一个对象，是否是一个特定类型#
+
+## 1.4 R对象的结构
+mylist <- list(a=c(1,2,3),b=c("cat","dog","duck"),d=factor("a","b","a"))
+mylist
+summary(mylist) #以上3行，展示如何简易显示list的整体结构（元素的名称、长度、类别、模式）
+sapply(mylist,mode) #以上1行，展示与summary的区别
+
+sample(letters,10) #以上1行，展示sample随机抽样函数，无放回抽样
+
+x <- 1:1000
+sample(x=x,size=15)#以上2行，展示sample随机抽样函数，无放回抽样
+
+a <- c("A","B")
+sample(x=a,size=10,replace=TRUE) #以上2行，展示sample随机抽样函数，有放回抽样
+
+x=c("S","F")
+sample(x,size=20,replace=TRUE,prob=c(0.8,0.2)) #以上2行，展示常见的二项分布概率问题。假设一名医生给患者做某手术成功的概率是80%，那么现在他给20例病人做手术，可能有哪几次是成功的呢
+
+x=c(1,3,5,7)
+sample(x,size=20,replace=T,prob=c(0.1,0.2,0.3,0.9)) #以上2行，展示对每一个元素都可以给定一个概率，且每个概率是独立的，即在参数prob中，不一定所有元素的概率加起来等于1
+
+runif(5,min=0,max=1) #以上1行，展示生成均匀分布随机数，n表示生成的随机数个数，min表示下限，max表示上限；若省略参数min、max,则默认生成[0,1]上的均匀分布随机数
+
+nestlist <- list(a=list(matrix(rnorm(10),5,2),val=3),
+                 b=list(sample(letters,10),values=runif(5)),
+                 c=list(list(1:10,1:20),list(1:5,1:10))
+)
+summary(nestlist) #以上5行，展示summary仅能提供第一层的对象的结构
+ls.str(nestlist) #以上1行，展示ls.str函数提供稍详细的一层对象
+str(nestlist) #以上1行，展示str函数structure提供对象所有组件的结构细节，vec.len = 参数控制显示元素的数目，max.level默认NA控制层数
+
+## 1.5 对象的转换
+nums <- c(12,10,8,12,10,12,8,10,12,8)
+tt <- table(nums)
+tt
+names(tt) #以上4行展示，函数系统自动换挡后标签8、10、12是字符型
+sum(as.numeric(names(tt))*tt) #以上1行，展示as.numeric函数暂时转为数值型，8*3+10*3+12*4=102 == sum(nums)
+
+x <- c(1,2,3,4,5)
+list(x)
+as.list(x) #以上3行展示，list和as.list的不同含义
+sum(x>3) #以上1行展示，利用T和F，比对X内各元素，得到F,F,F,T,T即0,0,0,1,1，所以sum=2。同理两个矩阵a和b，sum(a!=b)可得不等的元素的数目
+
+## 1.6 缺失值
+is.na(x) #检查是否有缺失值
+is.nan(x) #先用is.na查是否有缺失值，再用is.nan确认缺失值是inf或NaN
+
+## 1.7 缺失值的处理
+x <- c(1,2,NA,4,5)
+mean(x=x,na.rm=F)
+mean(x=x,na.rm=T) #以上3行，展示计算时是否忽略NA缺失值
+x[!is.na(x)] #以上1行，展示筛选出不带NA的数据
+na.omit(x) #以上1行，可以区分NA和非NA2个子集，然后在lm、glm、gam中na.action=来处理NA
+complete.cases(x) #以上1行，与na.omit功能相同
+
+#第2章 读取和写入数据
+## 2.1 读取向量和矩阵
+#所有被读取数据是同一mode时使用scan函数效率更高，适用vector和matrix
+## 2.2 数据框：read.table
+
+options(stringsAsFactors = FALSE) 
+#以上1行，在系统层面保证读入的表格中的文本元素不是因子，而是字符形式保存
+
+## 2.3 逗号和制表符分隔的输入文件
+### read.csv 逗号分隔数据
+### read.csv2 分号分隔数据
+### read.delim 制表符分隔数据
+## 2.4 固定宽度输入文件:read.fwf
+## 2.5 从R对象中提取数据
+slm <- lm(stack.loss~Air.Flow + Water.Temp,data=stackloss)
+print(slm)
+class(slm)
+mode(slm)
+apropos('.*\\.lm$') #以上1行，展示如何知晓lm函数可用的方法
+names(slm)
+slm$df.residual
+#以上，展示lm函数算线性模型时，结果其实可以被再次提取用于计算。先names查list中有那些对象，再提前相关的元素如df.residual
+library(methods)
+library(stats4)
+set.seed(19) #随机数生成器
+gamdata <- rgamma(100,shape=1.5,rate=5)
+loglik <- function(shape=1.5,rate=5)-sum(dgamma(gamdata,shape = shape,rate=rate,log = TRUE)) 
+mgam <- mle(loglik)
+class(mgam)
+isS4(mgam)
+
+showMethods(class='mle')
+vcov(mgam) #以上1行，展示方差-协方差矩阵的估计
+getClass(class(mgam)) #用getclass替代一般的names函数
+mgam@minuslogl #用@替代一般的$访问位置
+want <- 'minuslogl'
+slot(mgam,want) #以上2行，用slot替代@
+
+sslm <- summary(slm)
+class(slm)
+names(sslm)  #以上3行，通过summary将slm的R内数据都获得组件名
+
+## 2.6连接
+### file 函数 连接本地文件系统的文件
+### pipe 函数 连接输出的命令
+### textConnection 函数 连接将文本作为文件
+### gzfile 函数 本地gzip压缩文件
+### unz 函数 本地zip压缩文件存档（单一文件，只读）
+### bzfile 函数 本地bzip压缩文件
+### url 函数 通过http远程读取文件
+### socketConnection 函数 连接客户端/服务器套接程序
+
+rpage <- url('http://www.r-project.org','r')
+while(1){
+  l <- readLines(rpage,1) #readlines仅读取1行
+  if(length(l) == 0 ) break;
+  if(regexpr('has been released',l) > -1){
+    ver <- sub('</a.*$','',l)
+    print(gsub('^ *','',ver))
+    break
+  }
+} #以上10行，展示将网址读入rpage，'r'是读取，'w'是写入，'a'是附加
+
+gfile <- gzfile('mydata.gz')
+write.table(mydata,sep=',',file=gfile)
+mydata #以上3行，演示使用gzfile读取本地gzip压缩文件，并写入成table的过程
+
+sample1 <- textConnection('2000-2-29 1 0
+                         2002-4-29 1 5
+                         2004-10-4 2 0')
+read.table(sample1,colClasses = c('Date',NA,NA))
+
+sample2 <- textConnection('2000-2-29 1 0 2002-4-29 1 5 2004-10-4 2 0')
+read.table(sample2,colClasses = c('Date',NA,NA))
+#以上7行展示，textConnection连接文本，但间隔符不同，输出也不同
+
+mydata <- scan(unz('data.zip','mydata.txt')) 
+mydata #以上2行，展示unz函数提取zip数据，一次仅提取一个文件，且上文data.zip是假的
+
+## 2.7 读取大型数据文件
+###解决方案1：先将整个数据集纳入内存，再调用sample函数完成任务
+###解放方案2：先随机选择一些行，再分批读取这些行
+# readbig <- function(file,samplesz,chunksz,nrec=0){
+#  if(nrec <= 0) nrec = length(count.fields(file))
+#  f <- file(file,'r')
+#  on.exit(close(f))
+#  use <- sort(sample(nrec,samplesz))
+#  now <- readLines(f,1)
+#  k <- length(strsplit(now,'+')[[1]])
+#  seek(f,0)
+#  result <- matrix(0,samlpesz,k)
+#  
+#  read <- 0
+#  left <- nrec
+#  got <- 1
+#  while(left >0 ){
+#    now <- matrix(scan(f,n=chunksz+k),ncol=k,byrow = TRUE)
+#    begin <- read + 1
+#    end <- read + chunksz
+#    want <- (begin:end)[begin:end %in% use] - read
+#    if(length(want)>0){
+#      nowdat <- now[want,]
+#      newgot <- got+length(want) - 1
+#      result[got:newgot,] <- nowdat
+#      got <- newgot + 1
+#    }
+#    read <- read + chunksz
+#    left <- left - chunksz
+#  }
+#  return(result)
+#}
+
+## 2.8 生成数据
+### 2.8.1 序列
+1:10
+seq(1,10)
+seq(from=10,to=100,by=5)
+seq(from=10,by=5,length=10)
+
+thelevels <- data.frame(group=gl(3,10,length = 30),subgroup=gl(5,2,length = 30),obs=gl(2,1,length = 30))
+# 以上1行，展示gl函数Generate Factor Levels生成因子水平
+head(thelevels) #以上1行，预览头部数据
+
+thelevels <- data.frame(group=gl(3,10,length = 30),subgroup=gl(5,2,length = 30,ordered = TRUE),obs=gl(2,1,length = 30,labels =c("Control", "Treat")))
+thelevels #以上2行，展示ordered与labels进一步提供有序的因子元素
+
+oe <- expand.grid(odd= seq(from=1,to=5,by=2),even=seq(2,5,by=2))
+oe #效果同rbind与cbind,但1.省资源2.一个是data.frame另一个是matrix的区别
+odd1 <- cbind(odd,even[1])
+odd2 <- cbind(odd,even[2])
+oe <- rbind(odd1,odd2)
+oe
+
+input <- expand.grid(x=0:10,y=0:10)
+input
+res <- apply(input,1,function(row)row[1]^2+row[2]^2)
+head(cbind(input,res))
+#以上4行，演示x^2+y^2的值在x和y的定义域在0-10之间的值的范围
+
+## 2.8.2 随机数
+### rbeta 贝塔分布生成随机数
+### rbinom 二项分布生成随机数
+### rcauchy 柯西分布生成随机数
+### rchisq 卡方分布生成随机数
+### rexp 指数分布生成随机数
+### rf F分布生成随机数
+### rgamma 伽马分布生成随机数
+### rgeom 几何分布生成随机数
+### rhyper 超几何分布生成随机数
+### rlnorm 对数正态分布生成随机数
+### rlogis logis分布生成随机数
+### rmultinom 多项分布生成随机数
+### Rnbinom 负二项分布生成随机数
+### rnorm 正态分布生成随机数
+### rpois 珀松分布生成随机数
+### rsignrank 符合秩次分布生成随机数
+### rt 学生t分布生成随机数
+### runif 均匀分布生成随机数
+### rweibull 威尔布分布生成随机数
+### rwilcox 威尔考克斯秩和分布生成随机数
+
+## 2.9 排列
+### 2.9.1 随机排列
+sample(letters,10) #以上1行，展示sample随机抽样函数，无放回抽样
+
+x <- 1:1000
+sample(x=x,size=15)#以上2行，展示sample随机抽样函数，无放回抽样
+
+a <- c("A","B")
+sample(x=a,size=10,replace=TRUE) #以上2行，展示sample随机抽样函数，有放回抽样
+
+x=c("S","F")
+sample(x,size=20,replace=TRUE,prob=c(0.8,0.2)) #以上2行，展示常见的二项分布概率问题。假设一名医生给患者做某手术成功的概率是80%，那么现在他给20例病人做手术，可能有哪几次是成功的呢
+
+x=c(1,3,5,7)
+sample(x,size=20,replace=T,prob=c(0.1,0.2,0.3,0.9)) #以上2行，展示对每一个元素都可以给定一个概率，且每个概率是独立的，即在参数prob中，不一定所有元素的概率加起来等于1
+
+### 2.9.2 枚举所有排列
+install.packages("combinat")
+library("combinat")
+x <- 1:5
+### permn函数进行穷举计算
+### 可用factorial函数计算有多少排列存在
+###
+install.packages("sna")
+### 实在太大用sna程序包内的numperm函数
+
+## 2.10 序列的处理
+x <- c(1,2,4,2,5)
+table(x) #以上1行，测量每个值的次数
+unique(x) #以上1行，获得不同值 
+duplicated(x) #以上1行，返回逻辑值是否重复
+!duplicated(x) #以上1行，返回一个反向逻辑值向量
+
+sequence <- sample(1:10)
+rle(sequence) #以上2行，展示游程长度编码
+
+seq1 <- c(1,3,5,2,4,2,2,2,7,6)
+rle.seq1 <- rle(seq1) #游程长度编码用于测量连续相同值的个数
+any(rle.seq1$values == 2 & rle.seq1$lengths >=3)
+
+seq2 <- c(7,5,3,2,1,2,2,3,5,8)
+rle.seq2 <- rle(seq2)
+any(rle.seq2$values == 2 & rle.seq2$lengths >=3)
+
+seq1 <- c(1,3,5,2,4,2,2,2,7,6)
+rle.seq1 <- rle(seq1)
+index <- which(rle.seq1$values == 2 & rle.seq1$lengths >= 3)
+cumsum(rle.seq1$lengths)[index]
+#以上4行，展示用cumsum累计求和,以及得到游程结束点#
+
+index <- which(rle.seq1$values == 2 & rle.seq1$lengths >= 3)
+newindex <- ifelse(index >1 , index-1,0)
+starts <- cumsum(rle.seq1$lengths)[newindex]+1
+if(0 %in% newindex)starts= c(1,starts)
+starts
+#以上5行，展示用cumsum累计求和,以及得到游程起点#
+
+seq3 <- c(2,2,2,2,3,5,2,7,8,2,2,2,4,5,9,2,2,2)
+rle.seq3 <- rle(seq3)
+cumsum.seq3 <- cumsum(rle.seq3$lengths)
+myruns <- which(rle.seq3$values ==2 & rle.seq3$lengths >= 3)
+ends <- cumsum.seq3[myruns]
+newindex <- ifelse(test= myruns >1,yes = myruns -1 ,no = 0 )
+starts <- cumsum.seq3[newindex] +1
+if(0 %in% newindex) starts = c(1,starts)
+starts
+ends
+#以上10行，展示用cumsum累计求和,以及得到游程起点和终点#
+
+set.seed(19)
+randvals <- rnorm(100)
+rle.randvals <- rle(randvals > 0) #用游程来测量T和F的数量
+myruns <- which(rle.randvals$values == TRUE & rle.randvals$lengths >=5)
+any(myruns)
+#以上5行，展示用游程来测量T和F的数量#
+cumsum.randvals <- cumsum(rle.randvals$lengths)
+ends <- cumsum.randvals[myruns]
+newindex <- ifelse(test = myruns >1 ,yes = myruns-1, no= 0)
+starts <- cumsum.randvals[newindex]+1
+if(0 %in% newindex)starts = c(1,starts)
+starts
+ends
+randvals[starts:ends]
+#以上14行，展示完全用游程测量任意T和F#
+
+## 2.11 电子表格
+###2.11.1 基于Windows的RODBC包
+####1.最简单EXCEL导入R方法：利用EXCEL将xls文件转换为csv，然后用read.csv解决
+####2.使用gdata包的read.xls函数，但需要先安装perl
+####3.使用RODBC包
+install.packages("RODBC")
+library(RODBC)
+sheet <- 'D:\\sheet.xlsx'
+con <- odbcConnectExcel2007(sheet) 
+#odbcConnectExcel仅支持32位系统，odbcConnectExcel2007才支持64位系统#
+tbls <- sqlTables(con) #以上1行，展示查看可用电子表格的名称
+
+qry <- paste("select * from `",tbls$TABLE_NAME[1],"`",sep="") 
+result <- sqlQuery(con,qry) 
+#以上2行，展示提取数据的第1张表内容到result，尤其注意``号预防性措施解决表名称有空格、括号、美元符号的问题
+
+result
+
+####4.使用XLConnect包
+install.packages("XLConnect")
+library("XLConnect")
+df <- readWorksheetFromFile("D:\\sheet.xlsx", sheet=1, header=TRUE)
+df
+View(df)
+#以上5行，展示使用XLConnect包直接读取excel文件#
+
+## 2.12 保存和加载R数据对象
+###R内部是二进制形式保存数据.Rdata
+save(x,y,z,file='mydata.rdata') #以上1行，展示将对象xyz保存到R内部数据文件中
+save(list=c('x','y','z'),file='mydata1.rdata') #以上1行，展示将字符向量的对象名称的保存方法
+load('mydata.rdata')
+load('mydata1.rdata') #以上2行，展示如何读取rdata文件#
+
+## 2.13 处理二进制文件
+###这一部分内容太难了，我估计也用不到，二进制与C语言与计算机底层数据构架的问题了
+
+## 2.14 将R对象写入ASCII格式的文件
+### 2.14.1 write函数写ASCII码
+#### write适合于和scan同一类型的数据
+write(t(state.x77),file = 'state.txt',ncolumns = ncol(state.x77)) #因R矩阵内部按列存储，故T转置并调整ncolumns来按行写入txt
+#ncolumns可以指定写入每一行的值的数目
+#append=TRUE 可逐步追加建立一个输出文件
+
+## 2.14.2 write.table函数写入数据框的ASCII码
+#### write.table适合于read.table读取的数据类型
+write.table(CO2,file = 'co2.txt',col.names = T ,row.names = FALSE,sep = '\t') #分隔符用制表符
+#### 另：gdata包的write.fwf函数提供将R对象写入到固定字段宽度文件的功能
+
+## 2.15 从其他程序中读取数据
+### read.dta和write.dta 读取和创建Stata对象
+### read.dbf 读取或写入DBF文件（或FoxPro，dBase等）
+### data.restore 读取data.dump输出或用S第3版保存的对象
+### read.S 可用来处理更老的Splus对象
+### read.epinfo 读取epinfo生成的对象
+### read.spss 读取spss生成的对象，用save或export命令写入的
+### read.mtp 读取Minitab文件
+### read.octave 读取GNU octave生成的对象
+### read.xport 读取SAS导出的对象
+### read.systat 读取systat对象，仅适用于矩形（mtype=1)数据
+library(foreign)
+write.foreign(mydata,datafile = 'mydata.txt',codefile = 'mydata.stata',package='Stata')
+#以上2行，将R数据mydata传入Stata，而非转换为Stata数据格式另存#
+
+# 第3章 R与数据库
+## 3.1 SQL简介
+### 3.1.1 导航命令
+#### SHOW DATABASES 查找可用的数据库名称
+#### SHOW TABLES IN databases 查找某一数据库中表格名称
+#### SHOW COLUMNS IN table 查找表中的列名
+#### DESCRIBE table 查找表中的列类型
+#### USE database 更改默认数据库
+
+### 3.1.2 SQL基础
+####
+# SELECT columns or computations
+#     FROM table
+#     WHERE condition
+#     GROUP BY columns
+#     HAVING condition
+#     ORDER BY column [ASC | DESC ]
+#     LIMIT offset,count;
+######
+# SELECT * FROM tablename;
+# SELECT var1,var2,var2/var1 AS ratio FROM tablename;
+# 以上展示SQL语言已;结尾，可选“列”或“列的计算结果”，AS用于重命名
+# SELECT * FROM tablename WHERE var1 > 10 AND var2 < var1;
+# 以上1行，展示用WHERE和AND筛选行
+# SELECT var1，var2， var2/var1 AS ratio
+#    FROM tablename HAVING ratio >10;
+# 以上2行，展示用HAVING筛选语句中创建的变量
+# SQL语句中  LIKE允许使用%代表任意多个字符，用_代表1个字符，RLIKE允许使用常规的表达式表示字符的比较。
+
+### 3.1.3 综合汇总统计
+# SELECT type, AVG(x) AS mean
+#   FROM table 
+#   GROUP BY type;
+# 以上3行，展示分组统计与AVG均值的用法
+############
+# COUNT() 计数
+# AVG() 均值
+# MIN() 最小值
+# MAX() 最大值
+# VAR_SAMP() 样本方差
+# STDDEV_SAMP() 样本标准差
+############
+# SELECT type, COUNT(*) FROM table GROUP BY type;
+# 以上1行，用*可以计数行数
+
+### 3.1.4 两个数据库的合并
+#假设有2个表，表1为children有id,family_id,height,weight列，表2为mothers有id,family_id,income
+#新建表包含height,weight,income
+# SELECT height, weight, income FROM children
+#    INNER JOIN mothers USING(family_id);
+#效果同merge函数，但效率更高
+
+# 如果要同时出现儿童id和母亲id则
+# SELECT children.id, mothers.id, height, weight, income 
+#      FROM children
+#      INNER JOIN mothers USING(family_id);
+##也可以用AS轻松重命名
+# SELECT c.id as kidid, m.id as momid, height, weight, income 
+#      FROM children AS c
+#      INNER JOIN mothers AS m USING(family_id);
+##以上3行，展示用AS轻松重命名
+
+### 3.1.5 子查询
+# SELECT family_id, COUNT(*) AS ct
+#   FROM children
+#   GROUP BY family_id;
+# 以上3行，展示把所有家庭按size列成表格
+
+#SELECT ct, COUNT(*) as n
+#   FROM (SELECT COUNT(*) AS ct 
+#           FROM children
+#           GROUP BY family_id) AS x
+#   GROUP BY ct
+#以上5行，展示利用嵌套子查询完成汇算
+
+# 错误示例 SELECT * FROM children WHERE height = MAX(height);
+# 正确示例 SELECT * FROM children
+#             WHERE height = (SELECT MAX(height) AS height FROM children);
+# 以上3行，展示利用子查询解决空集或语法错误的逻辑问题
+
+### 3.1.6 修改数据库记录
+# UPDATE table SET var=value
+#     WHERE condition
+#     LIMIT n;
+#以上3行，展示更改数据库中选定值的标准语句,limit用于限制更改的记录数量
+
+# UPDATE children SET weight=100, height=55
+#     WHERE id = 12345;
+#以上2行，展示更改数据库的实例
+
+# INSERT INTO mydata VALUES('fred',7)
+# INSERT INTO mydata (number,name) VALUES(7,'fred')
+#以上2行，展示录入数据到数据库的方法
+
+# INSERT INTO mydata VALUES('tim',12),('sue',9)
+#以上1行，展示录入多个数据到数据库
+
+# DELETE FROM table
+#   WHERE condition
+#   LIMIT n;
+#以上3行，展示删除某个记录的语句
+
+# DROP TABLE tablename;
+#以上1行，展示删除整个表
+
+# DROP DATABASE dbname;
+#以上1行，展示删除整个数据库
+# DROP DATABASE IF EXISTS dbname;
+#以上1行，用IF EXISTS防止无table而导致DROP命令报错
+
+## 3.2 ODBC
+###使用ODBC第一步是建立一个DSN或数据源的名称
+###为了做到这一点,你需要知道你的计算机的名称,它将作为一个特定的数据源使用
+### Windows上ODBC管理器通过控制面板→管理工具→数据源(ODBC访问)用于建立DSN。
+### 在“驱动程序”选项卡上,你可以看到你的电脑有哪些可用的连接器,以及用来访问它们的名称可以使用这个名称,每次创建一个连接时提供额外的连接细节,也可以创建一个新的DSN
+### 要创建一个新的DSN,点击 User DSN选项卡下的“添加”按钮,然后从弹出窗口中选择适当的驱动程序，会出现你所使用的数据库的专用对话框,填写上信息即可创建DSN
+
+## 3.3 使用ROBDC包
+#### 学习了印象笔记中的Mysql安装和Navicat使用方法
+
+## 3.4 DBI包
+## 3.5 访问MySQL数据库
+## 3.6 执行查询
+library(DBI)
+library(RMySQL)
+drv <- dbDriver("MySQL")
+con <- dbConnect(drv,dbname='rtest',user='root',password='Bear:Bunny?two',host='localhost')
+mydata <- dbGetQuery(con,'select * from test')
+mydata
+#以上6行展示，在安装了MySql和Navicat的基础上，利用RmySQL读取数据库数据到R#
+
+## 3.7 规范化的表
+result <- dbGetQuery(con,'SELECT parts.name,parts.price,suppliers.name AS supplier
+                    FROM parts INNER JOIN
+                    suppliers USING (supplierid) ')
+result
+#以上4行，展示在数据库SQL中实现合并表#
+
+parts <- dbGetQuery(con,'SELECT * FROM parts')
+suppliers <- dbGetQuery(con,'SELECT * FROM suppliers')
+result <- merge(parts,suppliers,by='supplierid')
+result
+#以上4行，展示使用merge函数在R内合并表，但计算变慢因供应商名称character变量被作为字符变量存储，浪费了存储空间#
+
+parts <- dbGetQuery(con,'SELECT * FROM parts')
+suppliers <- dbGetQuery(con,'SELECT * FROM suppliers')
+result <- data.frame(name=parts$name,price=parts$price,
+                     supplier=factor(parts$supplierid,
+                                     levels = suppliers$supplierid, #这儿是关键点#
+                                     labels = suppliers$name
+                     )
+)
+result
+#以上9行，展示利用factor因子在R内合并表，且将供应商id作为因子变量，names作为标签处理#
+
+## 3.8 将数据读入MySQL
+library(DBI)
+library(RMySQL)
+drv <- dbDriver("MySQL")
+con <- dbConnect(drv,dbname='rtest',user='root',password='dcbA54321',host='localhost')
+dbWriteTable(conn=con,name="mydata",value=mydata,row.names=FALSE,overwrite= TRUE) # overwrite 或 append 一定要设置TRUE或FALSE#
+#以上5行，展示将R内已有数据框直接转存到数据库中#
+####### 
+#如果MySQL报错：Loading local data is disabled; this must be enabled on both the client and server sides#
+#处理方法：
+#客户端设置：从菜单栏打开MySQL的cmd命令对话框#
+#mysql> SHOW GLOBAL VARIABLES LIKE 'local_infile';
+#会出现+---------------+-------+
+#  | Variable_name | Value |
+#  +---------------+-------+
+#  | local_infile  | OFF   |
+#  +---------------+-------+
+#  1 row in set (0.04 sec)
+#
+#mysql> SET GLOBAL local_infile = true;
+#Query OK, 0 rows affected (0.00 sec)
+#
+#mysql> SHOW GLOBAL VARIABLES LIKE 'local_infile';
+#+---------------+-------+
+#  | Variable_name | Value |
+#  +---------------+-------+
+#  | local_infile  | ON    |
+#  +---------------+-------+
+#  1 row in set (0.00 sec)
+##########
+#服务端设置(不一定需要)
+#mysql.conf.d/mysqld.cnf的[mysqld]下面添加local-infile
+#conf.d/mysql.cnf的[mysql]下面添加local-infile
+#mysql.conf.d/mysql.cnf的[mysql]下面添加local-infile
+#重启mysql服务端#
+
+##############
+#以下7行，展示直接从txt文件经R转换导入MySQL，有很多前置条件，不好用，唯一好处是数据不占用R的内存池#
+
+install.packages("DBI")
+install.packages("RMySQL")
+library(DBI)
+library(RMySQL)
+dbGetQuery(con,"LOAD DATA INFILE 'mydata.txt'\
+            INTO TABLE mydatathree\ FIELDS TERMINATED BY ','
+           ")
+#1.必须先在MySQL中有表的框架;
+#2.有不少于一行的数据
+######
+#如果出现The MySQL server is running with the --secure-file-priv option so it cannot execute this statement
+#处理方法：从菜单栏打开MySQL的cmd命令对话框#
+#MySQL> SHOW VARIABLES LIKE "secure_file_priv";
+#依据返回的结果，去掉导入的目录限制。可修改mysql配置文件（Windows下为my.ini），
+#如上这样一行内容，如果没有，则手动添加。如果存在如下行：
+#secure_file_priv = /home 
+#这样一行内容，表示限制为/home文件夹。而如下行：
+#查看是否有：secure-file-priv = ""
+#如上这样一行内容，如果没有，则手动添加,表示不限制目录，等号一定要有，否则mysql无法启动。
+#修改完配置文件后，重启mysql生效。
+#关闭：win+R 在cmd中输入net stop mysql
+#启动：win+R 在cmd中输入net start mysql
+#以上7行，展示直接从txt文件经R转换导入MySQL，有很多前置条件，不好用，唯一好处是数据不占用R的内存池#
+
+## 3.9 更复杂的汇总
+library(DBI)
+library(RMySQL)
+library(RODBC)
+res1 <- dbSendQuery(con, 'SELECT group1,x,y FROM `rtest`.cordata ORDER BY group1') #group是SQL保留词，不用乱用来命名列#
+res1
+con <- dbConnect(drv,dbname='rtest',user='root',password='dcbA54321',host='localhost') #dbSendQuery后要用这一句重连数据库
+
+correlations <- dbApply(res1,INDEX='group1',FUN= function(df,group)cor(df$x,df$y))
+#dbGetQuery传送查询语句，把结果以数据框形式返回
+#dbSendQuery传送查询，返回的结果是继承"DBIResult"的一个子类的对象。
+#fetch用于获得查询结果的部分或全部行，并以列表返回。
+#dbHasCompleted确定是否所有行已经获得了，
+#dbGetRowCount返回结果中行的数目
+#如果只是简单的读整个表，也可以用dbReadTable函数
+
+###############
+#如果某个数据库没有dbApply函数，或者汇总的过程需要控制的更多，以下效果同dbApply
+# mydbapply <- function(con,table,groupv,otherv,fun){
+#query <-  paste('select ',groupv,' from ',table,' group by ',groupv,sep = '')
+#queryresult <- dbGetQuery(con,query)
+#answer <- list()
+#k <- 1
+#varlist <- paste(c(groupv,otherv),collapse = ',')
+#for(gg in queryresult[[groupv]]){
+#    qry <- paste('select ',varlist,' from ',table,' where ', groupv,' = "',gg,'"',sep = '')
+#    qryresult <- dbGetQuery(con,query)
+#    answer[[k]] <- fun(qryresult)
+#    names(answer)[k] = as.character(gg)
+#    k = k+1
+#  }
+#  return(answer)
+#}
+#correlations <- mydbapply(con,'cordata','group1',c('x','y'),function(df)cor(df$x,df$y))
+
+# 第4章 日期
+Sys.Date() #以上1行，返回当前日期
+Sys.time() #以上1行，返回当前时间
+format(Sys.Date(), "%a %b %d") #以上1行，展示输出格式
+format(Sys.Date(), "%c") #以上1行，展示日期完整输出格式
+
+## 4.1 as.Date
+######
+#as.Date为R内置处理日期，不能处理时间函数，从1970-1-1开始，早于这个日期实质为负数###
+# %d代表十进制日期
+# %m代表十进制月份
+# %y代表2位数年
+# %Y代表4位数年
+# %b代表缩略月份英文
+# %B代表全称月份英文
+# %a 星期的缩写
+# %A 星期的全称
+# %c 输出完整的时间 "Fri May 22 00:00:00 2020"
+# %C 输出年份的前两位
+#####
+as.Date(31,origin ='2019-01-01')
+#以上1行，展示不从1970-1-1开始的方法
+as.Date('2001-4-15') 
+as.Date('2001/04/15')
+as.Date('4/15/2001',format='%m/%d/%Y')
+as.Date('4/15/01',format='%m/%d/%y')
+as.Date('2001 04 15',format='%Y %m %d')
+as.Date('01,04,15',format='%y,%m,%d')
+as.Date('2001,04 15',format='%Y,%m %d')
+
+Sys.setenv(TZ="asia/shanghai")
+Sys.setlocale("LC_TIME","us") #以上2行，将系统环境中的时区设定为上海，但显示格式是美式英语US
+as.Date('April 15,2001',format='%B %d, %Y')
+as.Date('15APR01',format='%d%b%y')
+#以上4行，展示必须先设置当地缩写的种类，才能读取月份缩写或全称
+
+thedate <- as.Date("1/15/2001",format="%m/%d/%Y")
+ndate <- as.numeric(thedate)
+ndate
+class(ndate) = "Date"
+ndate
+#以上5行，展示将日期存储为数值，在从数值转换为日期
+
+weekdays(Sys.Date())
+months(Sys.Date())
+quarters(Sys.Date())
+#以上3行，展示提前日期的单个组成部分
+#但想提出days和years，要么as.character然后substring，要么用lubridate包提取
+
+f <- url('https://mirrors.tuna.tsinghua.edu.cn/CRAN/','r')
+rdates <- data.frame()
+while(1){
+  l = readLines(f,1)
+  if(length(l)==0)break
+  if(regexpr('href="R-',l) > -1){
+    parts = strsplit(l,' ')[[1]] 
+    rver = sub('^.*>(R-.*).tar.gz.*','\\1',l)
+    date = parts[18]
+    rdates = rbind(rdates,data.frame(ver=rver,Date=date))
+  }
+}
+rdates$Date = as.Date(rdates$Date,'%d-%B-%Y')
+table(weekdays(rdates$Date))
+#以上14行，展示统计R开发者喜欢周几发布新版本，但由于网址问题，以上代码执行错误
+
+## 4.2 chron包
+#chron包既可以处理日期，也处理时间，但不控制时区#
+# m代表十进制月份
+# d代表十进制日期
+# y代表4位数年
+# mon代表月（缩略）
+# month月（全称）
+# h小时
+# m分钟
+# s秒
+###第一次使用chron包前，若日期和时间存储在一起，要先把他们分开strsplit拆分字符串#
+install.packages("chron") 
+library(chron)
+dtimes <- c("2002-7-1 12:45:40","1970-01-01 09:30:01","2002-09-04 16:45:43",
+            "2002-11-13 20:1:40","2002-07-1 17:30:40")
+dtparts <- t(as.data.frame(strsplit(dtimes,' '))) #以上1行，演示先strsplit拆分为list,在将list转为data.frame,然后再将数据框转置成为数据框的标准格式
+row.names(dtparts) = NULL #以上1行，将数据框的行名去除
+thetimes <- chron(dates= dtparts[,1],times=dtparts[,2],format = c('y-m-d','h:m:s'))
+as.numeric(thetimes[2]) #以上1行，实际计算过程为thetimes[2]值减1970-1-1日期值，再除以((9.5*60*60)+1)/(60*60*24)即全部换算成秒
+thetimes[5]-thetimes[1]
+thetimes[1]-thetimes[5]
+as.numeric(thetimes[5]-thetimes[1])#以上3行，演示正负数值的不同表达方式
+
+## 4.3 POSIX类
+#POSIXct将日期/时间值作为1970年1月1日开始的秒数进行存储，通常的选择
+#POSIXlt将日期/时间值作为list存储秒/分/小时/日/月/年6类元素
+# "1915/6/16" "1915-06-16 11:02" "1915-6-16 11:02:06" 
+
+dts1 <- c("1915/6/16","1915/06/16 11:02")
+as.POSIXct(dts1)
+as.POSIXlt(dts1)
+dts2 <- c("1915-06-16 11:02","1915-6-16")
+as.POSIXct(dts1)
+mydates <- as.POSIXlt(dts1)
+mydates
+mode(mydates)
+class(mydates)
+#以上7行，展示POSIX会读取最短时间长度,同时展示了POSIXlt的属性#
+
+dts <- c("2005-10-21 18:47:22 CST","2005-12-24 16:39:58 PDT","2005-10-28 07:30:05 PDT")
+as.POSIXct(dts)
+as.POSIXlt(dts)
+#时区问题,注意以上3行解决"时区"和"夏令时"问题是失败的！！！
+
+Sys.setenv(TZ="America/Los_Angeles")
+Sys.setlocale("LC_TIME","us") #以上2行，将系统环境中的时区设定为PDT洛杉矶时间，但显示格式是美式英语US
+dts<- c(1127056501,1104295502,1129233601,1113547501,
+        1119826801,1132519502,1125298801,1113289201)
+mydates <- dts
+class(mydates) = c('POSIXt','POSIXct')
+mydates
+mode(mydates)
+class(mydates)
+##以上9行，用精确秒数，才解决了"时区"和"夏令时"问题
+mydates <- structure(dts,class=c('POSIXt','POSIXct'))
+mydates
+#以上2行，展示structure减少转换过程#
+
+### strptime和strftime函数
+#strptime= parse解析输入时间 从字符串->时间元祖
+#strftime= format格式化输出时间 从时间元祖->字符串显示
+################################
+# %a 普通日的缩略语           %A 普通日的全称
+# %b 月的缩略语               %B 月的全称
+# %c 特定的日期和时间         %d 十进制日
+# %H 十进制小时（24h）        %I 十进制小时（12h） 
+# %j 十进制日（按年算）       %m 十进制月
+# %M 十进制分钟               %p 特定的上午/下午
+# %S 十进制秒                 %U 十进制周（从星期日开始）
+# %w 十进制普通日（0=星期日） %W 十进制周（从星期一开始）
+# %x 特定的日期               %X 特定的时间
+# %y 两位数年                 %Y 4位数年
+# %z 与格林尼治标准时间的偏差 %Z 时区（字符）
+################################
+mydate <- strptime('16/Oct/2005:07:51:00 CST',format = '%d/%b/%Y:%H:%M:%S',tz="America/Los_Angeles")
+mydate
+#以上2行，展示时间的录入，注意时区#
+
+mydates <- c('20060515 112504.5','20060518 101000.3','20061120 20035.1')
+dtparts <- t(as.data.frame(strsplit(mydates,' ')))
+row.names(dtparts) = NULL #以上1行，将数据框的行名去除,必不可少！
+dtimes <- strptime(dtparts[,1],format='%Y%m%d')+as.numeric(dtparts[,2])
+dtimes
+#以上5行，展示日期+时间的秒数如何录入为时间元祖#
+
+thedate <-ISOdate(2006,6,16,7,15,04,tz="EUROPE/LONDON")
+#以上1行，展示使用ISOdate直接录入时间元祖
+format(thedate, '%A, %B%d, %Y %H:%M:%S %z %Z',usetz = TRUE)
+#以上1行，展示format直接调用strftime展示时间字符串
+
+mydate <- as.POSIXlt('2005-4-19 7:01:00')
+mode(mydate)
+unclass(mydate) 
+attr(mydate, "names") #names(mydate)是不行的，要用这一行或unclass才能得到list名
+mydate$mday
+#以上4行展示POSIXlt的list属性#
+
+## 4.4 日期的处理
+rdates <- c("1.0","29Feb2000",
+            "1.1","15Jun2000",
+            "1.2","15Dec2000",
+            "1.3","22Jun2001",
+            "1.4","19Dec2001",
+            "1.5","29Apr2002",
+            "1.6","1Oct2002",
+            "1.7","16Apr2003",
+            "1.8","8Oct2003",
+            "1.9","12Apr2004",
+            "2.0","4Oct2004"
+)
+rdates <- as.data.frame(matrix(rdates,ncol = 2,byrow = TRUE))
+Sys.setenv(TZ="asia/shanghai")
+Sys.setlocale("LC_TIME","us") #以上2行，将系统环境中的时区设定为上海，但显示格式是美式英语US
+rdates[,2] <- as.Date(rdates[,2],format = "%d%b%Y") #必须先设置英文显示格式
+names(rdates) <- c("Release","Date")
+rdates
+#以上18行，展示字符串先转矩阵再转数据框，再识别读取日期#
+mean(rdates$Date)
+range(rdates$Date)
+rdates$Date[11]-rdates$Date[1]
+
+## 4.5 时间间隔
+b1 <- ISOdate(1977,7,13)
+b2 <- ISOdate(2003,8,14)
+b2-b1
+difftime(b2,b1,units = 'weeks')
+#以上4行，展示difftime函数直接算出周
+
+ydiff <- (b2-b1) /365.25
+ydiff
+attr(ydiff,'units') ='year'
+ydiff
+#以上4行，展示直接数学计算日期差是可以的，但是单位是不变的，所以要改一下单位的属性#
+
+## 4.6 时间序列
+seq(as.Date('1976-6-4'),by='days',length=10)
+seq(as.Date('1976-6-4'),by='3 weeks',length=10)
+seq(as.Date('1976-6-4'),by='3 quarters',length=10)
+#以上3行，展示通过天、周、季度完成序列自动生成
+seq(as.Date('2000-6-1'),to=as.Date('2000-8-1'),by='3 weeks')
+#以上1行，展示起点终点已知完成序列生成
+
+table(rdates$Date)
+format(rdates$Date,'%A')
+table(format(rdates$Date,'%A'))
+#以上3行，展示自动统计周，而不仅是自动统计日#
+
+fdate <- factor(format(rdates$Date,'%Y'))
+fdate
+#以上2行，展示日期元祖直接转换为因子水平元素#
+
+# 第5章 因子（类型变量）
+## 5.1 因子的使用
+data <- c(1,2,2,3,1,2,3,3,1,2,3,3,1)
+fdata <- factor(data)
+fdata
+levels(fdata) #以上1行，levels函数返回因子类型水平有哪几个
+nlevels(fdata) #以上1行，nlevels函数返回有多少个因子水平
+
+rdata <- factor(data,labels = c("I","II","III"))
+rdata #以上2行，展示如何因子值的外显方式
+
+mons <- c("March","April","January","November","January",
+          "September","October","September","November","August",
+          "January","November","November","February","May",
+          "August","July","December","August","August",
+          "September","November","February","April"
+)
+mons <- factor(mons)
+table(mons)
+#以上8行，展示无序因子序列#
+
+mons <- factor(mons,levels=c("January","February","March","April","May","June",
+                             "July","August","September","October","November","December"),
+               ordered = TRUE)
+mons[1] < mons[2]
+table(mons)
+#以上5行，展示有序因子序列#
+
+data("InsectSprays")
+InsectSprays
+tapply(InsectSprays$count, INDEX = InsectSprays$spray, FUN = mean)
+levels(InsectSprays$spray)
+InsectSprays$spray <- with(InsectSprays, reorder(spray,count,mean))
+levels(InsectSprays$spray)
+#以上6行展示，reorder函数根据spray每个水平下count的均值mean进行升序排列#
+attr(InsectSprays$spray,'scores')
+#以上1行，展示reorder函数通过scores的属性赋值完成升序排列
+
+data("InsectSprays")
+InsectSprays
+tapply(InsectSprays$count, INDEX = InsectSprays$spray, FUN = mean)
+levels(InsectSprays$spray)
+InsectSprays$spray <- relevel(InsectSprays$spray,'C')
+levels(InsectSprays$spray)
+#以上6行，展示relevel函数将C设置为参照水平的第一个水平#
+
+## 5.2 数值型因子
+fert <- c(10,20,20,50,10,20,10,50,20)
+fert <- factor(fert,levels = c(10,20,50),ordered = TRUE)
+fert
+mean(fert)
+#以上4行，展示因子元素并不能直接参与数值计算#
+mean(as.numeric(as.character(fert)))
+mean(as.numeric(levels(fert)[fert]))
+#以上2行，展示以上2种方式才能让因子元素转换为可计算的数值元素
+
+## 5.3 因子的操作
+lets <- sample(letters,size=100,replace=TRUE)
+lets <- factor(lets)
+table(lets)
+table(lets[1:5])
+table(lets[1:5,drop=TRUE])
+table(factor(lets[1:5])) #这1行，与上1行实现方法不同，但效果相同，通过创建新的类型变量实现
+#以上6行，展示因子的水平数和元素的实际个数不一定相同，提取因子的子集也保留原有的所有水平
+
+nums1 <- c(1,2,3,4,NA,6)
+factor(nums1)
+factor(nums1,exclude = NULL)
+#以上3行，展示含有NA的数值型变量转为因子变量时，exclude=NULL函数保证因子水平也有<NA>#
+factor(nums1,exclude = 6)
+factor(lets,exclude = "z")
+
+nums2 <- c(1,2,3,4,6)
+factor(nums2,exclude = 6)
+#以上4行，展示exclude后因子水平不含，且元素转为NA,注意nums1和nums2在因子水平上的区别
+
+fact1 <- factor(sample(letters,size=10,replace=TRUE))
+fact2 <- factor(sample(letters,size=10,replace=TRUE))
+fact1
+fact2
+c(fact1,fact2) #直接合并是不可以的，c函数将因子全理解为整数了
+fact12 <- factor(c(levels(fact1)[fact1],levels(fact2)[fact2]))
+fact12
+#以上7行，展示c函数合并两个因子变量，必须先levels(*)[*]将因子元素转换回原始值#
+
+## 5.4 根据连续变量创建因子
+data(women)
+women
+wfact1 <- cut(women$weight,3)
+wfact1
+table(wfact1)
+
+wfact2 <- cut(women$weight,pretty(women$weight,3))
+wfact2
+#以上8行，展示pretty函数在cut中将分界点取整数值#
+
+wfact1 <- cut(women$weight,3,labels = c('Low','Medium','High'))
+wfact1
+table(wfact1)
+#以上3行，展示labels指定因子的水平
+
+quantile(women$weight)
+quantile(women$weight,0)
+quantile(women$weight,0.25)
+wfact3 <- cut(women$weight,quantile(women$weight,(0:4)/4)) #(0:4)/4是为了自动生成0，1，2，3，4然后除以4得四分位间距
+table(wfact3)
+#以上5行，展示通过四分位间距，确保每个因子水平内有相同数目的观测值
+
+## 5.5 基于日期和时间的因子
+everyday <- seq(from=as.Date('2005-1-1'),to=as.Date('2005-12-31'),by='day')
+everyday
+#以上2行，展示利用seq和strftime函数提取每一天作为一个因子水平#
+
+Sys.setenv(TZ="asia/shanghai")
+Sys.setlocale("LC_TIME","us") #以上2行，将系统环境中的时区设定为上海，但显示格式是美式英语US
+cmonth <- format(everyday,'%b')
+cmonth
+months <- factor(cmonth,levels=unique(cmonth),ordered = TRUE)
+table(months)
+#以上6行，展示strftime函数将每日转为缩写月份，再转为因子变量#
+
+wks1<- cut(everyday,breaks='week')
+head(wks1)
+wks2<- cut(everyday,breaks='week',start.on.monday = FALSE) #该1行，从周日开始cut
+head(wks2)
+#以上4行，展示cut函数按照周切割因子水平，head函数查看头部数据列，tail()函数查看尾部数据列#
+
+qtrs <- cut(x=everyday,breaks='3 months',labels=paste('Q',1:5,sep=''))
+tail(qtrs)
+#以上2行，展示cut按照季度切割，注意因子水平的Q5#
+
+## 5.6 交互作用
+data(CO2)
+CO2
+newfact <- interaction(CO2$Plant,CO2$Type)
+newfact
+nlevels(newfact)
+#以上5行，展示如何交互2个现有的因子变量，形成新的因子变量，原PLANT12水平和Type2水平形成新的24水平#
+
+newfact2 <- interaction(CO2$Plant,CO2$Type,drop=TRUE,sep='￥')
+newfact2
+nlevels(newfact2)
+#以上3行，展示交互时，用drop仅保留有真实测量值的因子水平，用￥替代默认的.
+
+# 第6章 下标
+## 6.1 下标的基础知识
+#元素或元组在向量vector、矩阵matrix、多维数组array、数据框dataframe、列表list内
+
+## 6.2 数值型下标
+#使用数值型下标时，必须全为正数或负数
+
+## 6.3 字符型下标
+stack.x[,'Air.Flow']
+
+## 6.4 逻辑型下标
+nums <- c(12,9,8,14,7,16,3,2,9)
+nums > 10
+nums[nums>10]
+which(nums>10)
+seq(nums)[nums>10] #该1行，与上1行等价
+#以上5行，展示逻辑型下标的工作原理#
+
+nums[nums>10] <- 0
+nums
+#以上2行，展示逻辑型下标筛选出合适值后，被赋值0替换原位置的值#
+
+## 6.5 矩阵和数组的下标
+x <- matrix(1:12,4,3)
+x
+x[,1]
+x[,c(3,1)]
+x[2,]
+x[10]
+#以上6行，展示矩阵中下标取数的规则#
+
+stack.x
+order(stack.x[,'Air.Flow']) #此1行，将序号重排了
+stack.x.a <- stack.x[order(stack.x[,'Air.Flow'],decreasing = TRUE),]
+head(stack.x.a)
+tail(stack.x.a)
+#以上5行，展示order函数的工作原理#
+
+data(iris)
+iris
+sortframe <- function(df,...)df[do.call(order,list(...)),]
+with(iris,sortframe(iris,Sepal.Length,Sepal.Width))
+#以上4行，展示do.call函数编写批处理的function，实现多变量排序#
+#split和do.call功能相反
+
+riris <- iris[rev(1:nrow(iris)),]
+riris
+#以上2行，展示rev函数实现整个数据框的倒排#
+
+x <- matrix(1:12,4,3)
+x
+x[,1]
+x[,1,drop=FALSE]
+stack.x[,'Air.Flow']
+stack.x[,'Air.Flow',drop=FALSE]
+#以上6行，展示drop函数实现下标不降维的方法#
+
+x[,1] < 3
+x[x[,1] < 3,]
+#以上2行，通过嵌套，实现找出第一列小于3的所有行
+
+mat <- matrix(scan(),ncol=3,byrow=TRUE)
+#然后在编译框内输入1 1 12 1 2 7 2 1 9 2 2 16 3 1 12 3 2 15，回车确认#
+mat
+newmat <- matrix(NA,3,2)
+newmat
+newmat[mat[,1:2]] <- mat[,3]
+newmat
+#以上7行，展示用mat1、2列的值作为newmat的下标，用第3列填充
+
+## 6.6 矩阵的特殊函数
+method1 <- c(1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4)
+method2 <- c(1,2,2,3,2,2,1,3,3,3,2,4,1,4,4,3)
+tt <- table(method1,method2)
+tt
+offd <- row(tt)!=col(tt)
+offd
+#以上6行，展示row和col联合实现提取非diagonal元素的效果#
+tt[offd]
+#以上1行，展示row和col联合实现提取非diagonal元素的效果#
+sum(tt[offd])
+#以上1行，展示sum计算非对角线元素的总和
+lower.tri(tt)
+lower.tri(tt,diag = TRUE)
+upper.tri(tt)
+diag(tt)
+#以上4行，展示如何读取矩阵的特殊部分#
+
+## 6.7 列表
+simple <- list(a=c('fred','sam','harry'),b=c(24,17,19,22))
+simple
+mode(simple)
+simple[2]
+mode(simple[2])
+mean(simple[2])
+#以上6行，展示list的一部分虽然是向量，但对向量的操作不一定适用于list的局部#
+mode(simple$b)
+mean(simple$b)
+mean(simple[[2]])
+mean(simple[["b"]])
+#以上4行，展示了绕过list限制，直接访问实际内容的3种方法#
+simple[1]
+simple[[1]]
+#以上2行，展示单括号[]和双括号[[]]的，访问内容的实际区别
+
+## 6.8 数据框dataframe下标
+dd <- data.frame(a=c(5,9,12,15,17,11),b=c(8,NA,12,10,NA,15))
+dd
+dd[dd$b>10,]
+#以上3行，展示dataframe的单下标[]表现更像list而非matrix#
+
+dd[!is.na(dd$b) & dd$b>10,]
+#以上1行，展示dataframe中使用逻辑值下标要排除NA的方法
+subset(dd,b>10)
+#以上1行，展示dataframe中使用subset函数排除NA的方法
+
+LifeCycleSavings
+some1 <- subset(LifeCycleSavings,sr>10,select = c(pop15,pop75))
+some1
+life1 <- subset(LifeCycleSavings,select = pop15:dpi)
+life1
+life2 <- subset(LifeCycleSavings,select = 1:3)
+life2
+life3 <- subset(LifeCycleSavings,select =  c(-pop15,-pop75))
+life3
+life4 <- subset(LifeCycleSavings,select = -c(2:3))
+life4
+#以上11行，展示使用subset函数和selec参数生成子集的方法#
+
+# 第7章 字符操作
+## 7.1 字符数据的基础知识
+state.name
+length(state.name)
+nchar(state.name)
+#以上3行，展示length和nchar的区别，nchar测量每个元素的字符长度
+
+## 7.2 显示和连接字符串
+x <- 7
+y <- 10
+cat('x should be greater than y, but x=',x,'and y=',y,'\n')
+
+
+cat('Long strings can','be displayed over','several lines usin','the fill=argument')
+cat('Long strings can','be displayed over','several lines usin','the fill=argument',fill=40)
+#以上2行，展示fill参数自动插入\n，并设置行宽linesize为40width #
+
+cat('Long strings can','be displayed over','several lines usin','the fill=argument',fill=40,file="cat.txt")
+cat('\n\n text',fill=40,file="cat.txt",append = TRUE)
+#以上2行，展示file函数输出txt文档，append函数可追加输出#
+
+paste('one',2,'three',4,'five')
+#以上1行，展示paste将数值型元素转为字符，再整体输出#
+paste(c('one','two','three','four'))
+paste(c('one','two','three','four'),sep = ' ')
+paste(c('one','two','three','four'),collapse = ' ')
+#以上3行，展示paste对于c向量合集，sep分隔无效需用collapse#
+
+x <- paste('x',1:5,sep = ',')
+x
+x[2]
+#以上3行，展示利用paste函数，实现批量重命名#
+
+paste(c('X','Y'),1:5,sep = '')
+#以上1行，展示利用paste函数，实现批量重命名#
+paste(c('X','Y'),1:5,sep = '_',collapse = '|')
+#以上1行，展示利用paste函数实现批量重命名,再由collapse合并为一个整体元素#
+
+paste(c('X','Y'),1:5,'^',c('a','b'),sep = '_')
+paste(c('X','Y'),1:5,'^',c('a','b'),sep = '_',collapse = '|')
+#以上2行，展示paste对于c向量合集可批量循环，再由collapse合并为一个整体元素#
+
+## 7.3 处理分散的字符值
+state.name
+substring(state.name,first=2,last=6)
+substr(state.name,start=2,stop=6)
+#以上3行，展示substring（与S语言兼容）和substr函数，注意ohio和TEXAS没有填补#
+
+mystring <- 'dog cat duck'
+substring(mystring,c(1,5,9),c(3,7,12))
+strsplit(mystring,' ')
+#以上3行，展示substring函数的向量化批量操作,效果同strsplit函数#
+
+state <- 'Mississippi'
+ll <- nchar(state)
+ltrs <- substring(state,first = 1:ll,last = 1:ll)
+ltrs
+#以上4行，展示如何substring函数将一个单词拆分为字母#
+which(ltrs == 's')
+#以上1行，展示查找s字母在单词中的位置#
+
+mystring <- 'dog cat duck'
+substring(mystring,5,7) <- 'feline'
+mystring
+
+mystring <- 'dog cat duck'
+substring(mystring,5,7) <- 'a'
+mystring
+#以上7行，展示用substring而不是正则表达式sub函数做替换的效果，不会完全覆盖
+
+######################################################
+#一大堆正则表达式的基本使用规则需要找基础书籍补习一下#
+######################################################
+## 7.4 R中的正则表达式regular expression
+expr1 <- '.*\\.txt'
+expr1
+nchar(expr1)
+cat(expr1,'\n')
+#以上4行，展示\反斜杆在nchar与car函数中都不占位置#
+
+expr2 <- readline()
+expr2
+nchar(expr2)
+#以上3行，展示从编译框内录入.*\.txt会发生的自动添加\\#
+
+## 7.5 正则表达式的基础知识
+### .^$+?*()[]{}|\ 以上14个字符必须加\\才能正确表达
+#################
+# ^定位表达式，目标开始
+# $定位表达式，目标结束
+# .匹配换行符以外的任何单个字符
+# |分隔不同的模式
+# ()将相同模式放在一起
+# *匹配前面的实体出现0次或更多次
+# ?匹配前面的实体出现0次或1次
+# +匹配前面的实体出现1次或更多次
+# {n}匹配前面的实体精确地出现n次
+# {n,}匹配前面的实体至少出现n次
+# {n,m}匹配出现次数在n次和m次之间
+#################
+
+"^[a-zA-z]+\\.jpg$"
+#以上1行，展示保存路径的正则表达式
+
+strs <- c('chicken','dog','cat')
+strs
+expr <- paste(strs,collapse = '|')
+expr
+#以上4行，展示expr由于|可用作一个正则表达式匹配原向量中的任何单词#
+
+## 7.6 拆分字符值
+sentence <- 'R is a free software environment for statistical computing'
+sentence
+parts1 <- strsplit(x=sentence,split='')
+parts1
+parts2 <- strsplit(x=sentence,split=' ')
+parts2
+
+length(parts2)
+length(parts2[1])
+length(parts2[[1]])
+#以上10行，展示strsplit函数拆分字符串#
+
+more <- c('R is a free software environment for statistical computing',
+          'It compiles and runs on a wide variety of UNIX platforms'
+)
+more
+result <- strsplit(more,' ')
+result
+lapply(result,length)
+sapply(result,length)
+#以上8行，展示lapply和sapply批量处理more这个list#
+
+allparts <- unlist(result)
+allparts
+#以上2行，展示strsplit函数拆分后，用unlist将list合并成一个向量#
+
+str <- "one  two   three four"
+strsplit(str,' ')
+strsplit(str,' +')
+#以上3行，展示strsplit和+联用 #
+
+words <- c('one two','three four')
+strsplit(words,'')
+#以上2行，展示strsplit和substring函数一样将一个单词拆分为字母的过程#
+
+## 7.7 在R中使用正则表达式（查找find功能）
+LifeCycleSavings
+grep('^pop',names(LifeCycleSavings))
+grep('^pop',names(LifeCycleSavings),value = TRUE)
+#以上3行，展示grep函数查找值，^定位表达式，目标开始；value确认返回的是实际字符串值还是索引号
+
+grep('^pop',names(LifeCycleSavings),value = TRUE,fixed = FALSE) #字符串是正则表达式
+grep('pop',names(LifeCycleSavings),value = TRUE,fixed = TRUE) #字符串是字面解释
+#以上2行，展示fixed参数的作用，让匹配的字符串采用字面解释而不是作为正则表达式使用
+
+data.frame(LifeCycleSavings[,grep('^pop',names(LifeCycleSavings))])
+#以上1行，展示grep函数最大的作用是构建只有这些变量的数据框#
+
+inp <- c('run dog run','work doggedly','CAT AND DOG')
+grep('dog',inp,ignore.case = TRUE)
+grep('\\<dog\\>',inp,ignore.case = TRUE)
+#以上3行，展示ingnore.case参数忽略大小写，\\<dog\\>参数忽略局部匹配的情况，必须完全匹配#
+
+str1 <- c('The R Foundation','is a not for profit organization','working in the public interest')
+str2 <- c(' It was founded by the members','of the R Core Team in order','to provide support for the R project')
+any(grep('profit',str1))
+any(grep('profit',str2))
+#以上4行，展示用any函数测试是否有符合条件的正则表达式#
+
+tst <- c('one x7 two b1','three c5 four b9','five six seven','A8 eight nine')
+wh1 <- regexpr('[a-z][0-9]',tst)
+wh1
+#以上3行，查找首字符为[a-z]第二个字符为[0-9]的正则表达式，使用regexpr函数返回第一个匹配字符的起始点位置，没有匹配值的返回-1#
+#其中的attr(wh,"match.length")返回匹配值的长度#
+res <- substring(tst,wh1,wh1+attr(wh1,"match.length")-1)
+res
+#以上2行，展示再使用substring提取原始字符串#
+res[res!=""]
+#以上1行，删除空字符串#
+
+tst <- c('one x7 two b1','three c5 four b9','five six seven','A8 eight nine')
+wh2 <- regexpr('[a-z][0-9]',tst,ignore.case = TRUE)
+wh2
+res <- substring(tst,wh2,wh2+attr(wh2,"match.length")-1)
+res
+res[res!=""]
+#以上1行，展示ignore.case = TRUE忽略大小写#
+
+wh3 <- gregexpr('[a-z][0-9]',tst,ignore.case = TRUE)
+wh3
+#以上2行，查找首字符为[a-z]且忽略大小写，第二个字符为[0-9]的正则表达式，使用gregexpr函数返回所有匹配字符的起始点位置，没有匹配值的返回-1#
+
+res3 <- list()
+for(i in 1:length(wh3)){
+  res3[[i]] = substring(tst[i],wh3[[i]],wh3[[i]]+attr(wh3[[i]],"match.length")-1)}
+res3
+#以上4行，展示利用for循环，在list内使用substr提取原始字符串#
+
+getexpr <- function(str,greg)substring(str,greg,greg+attr(greg,'match.length')-1)
+res4 <- mapply(getexpr,tst,wh3)
+res4
+#以上3行，展示mapply替代for进行循环，
+#需要1.编写一个function函数;2.tst和wh3代码前置都跑过#
+#mapply将输入的tst字符串作为输出的名称#
+
+## 7.8 替换和标记（替换substitute功能，打标签后对文本char直接添加或者提取值的功能）
+value <- c('$11,317.35','$11,234.51','$11,275.89','$11,278.93','$11,294.94')
+value
+value <- gsub('[$,]','',value)
+value
+as.numeric(value)
+#以上5行，展示文本-->去除$和,的干净文本-->数值的转换过程
+
+values <- c('75.99','(20.30)','55.20')
+values
+values <- gsub('\\(([0-9.]+)\\)','-\\1',values)
+values
+as.numeric(values)
+#sub和gsub的替换功能好理解，但要实现"批量添加"功能需要：
+#1.查找出要替换的内容；2.用\\1打标签；3.在替换栏中引用\\1标签添加内容#
+#以上5行，展示先查找出完整的(),再\\给打上标签，再添加-号#
+values <- c('75.99','(20.30)','55.20')
+values
+values <- gsub('\\(([0-9.]+)\\)','-\\1+\\2',values)
+values
+#以上4行，更直观的展示了\\做标记的过程#
+
+str <- 'report: 17 value=15 time=2:00'
+sub('value=([^ ]+)','\\1',str) # [^ ]+ 被解释为一个或多个非空字符的发生#
+sub('^.*value=([^ ]+).*$','\\1',str)
+#以上3行，展示正则表达式下sub函数先打标记，然后直接从不等长文本中直接提取值的方法#
+
+str <- 'report: 17 value=15 time=2:00'
+greg <- gregexpr('value=[^ ]+',str)[[1]] #因为gregexpr提取出来是一个list所以仅要第1个进行降维#
+greg
+sub('value=([^ ]+)','\\1',substring(str,greg,greg+attr(greg,'match.length')-1))
+#以上4行，展示另一种查找策略：先regexpr或gregexpr查找值，再用sub或gsub从等长文本中提取值的方法#
+
+# 第8章 数据汇总
+###########################
+##数据汇总的函数基本分两类
+##1.为matrix、array和list设计的apply、sweep、mapply、sapply和lapply
+##2.为dataframe设计的aggregate和by
+###########################
+
+## 8.1 table函数
+pets <- c('dog','cat','duck','chicken','duck','cat','dog',NA)
+tt <- table(pets)
+tt
+mode(tt)
+class(tt)
+typeof(tt)
+tt['duck']
+tt['dog']
+names(tt)
+#以上9行，展示table函数的基本属性#
+table(pets,exclude = NULL)
+#以上1行，展示exclude参数NULL情况下，统计包括缺失值NA
+
+as.data.frame(tt)
+#以上1行，展示table转换为dataframe的方法#
+
+state.x77
+names(state.x77)
+hiinc <- state.x77[,'Income']> median(state.x77[,'Income'])
+hiinc
+names(hiinc)
+state.region
+stateinc <- table(state.region,hiinc)
+stateinc
+as.data.frame(stateinc)
+#以上9行，展示多个向量传递给table时，返回与向量内元素数一样多的n维数组，在这里是4*2，最后由as.data.frame降维压平#
+
+x <- data.frame(a=c(1,2,2,1,2,2,1),b=c(1,2,2,1,1,2,1),c=c(1,1,2,1,2,2,1))
+x
+table(x) #只给了一个参数x，且x是一个dataframe，所以table中默认a列作为行，b列作为列,c列作为层,形成了list#
+as.data.frame(table(x))
+#以上4行，展示table后是一个list被压平为dataframe被展示freq的过程#
+
+head(infert)
+tt <- table(infert$education,infert$parity)
+tt
+tt1 <- addmargins(tt,margin=1) #1表示添加一行各列的合计，2表示添加一列各行的合计
+tt1
+tt12 <- addmargins(tt,margin=c(1,2),FUN = mean)
+tt12 #默认SUM，用FUN=参数指定其他合计函数
+dimnames(tt12)
+#以上8行，展示addmargins函数添加合计功能#
+
+prop.table(tt,margin=2)
+prop.table(tt)
+#以上2行，展示prop.table函数显示频率表，而不是频数表，不指定margin值则所有单元格的和为1#
+
+tail(UCBAdmissions)
+ftable(UCBAdmissions)
+#以上2行，展示ftable函数将多维表格扁平化
+
+xtabs(~state.region+hiinc)
+#以上1行，展示R统计用xtabs列联表函数，生成与table函数相似结果表
+
+x <- data.frame(a=c(1,2,2,1,2,2,1),b=c(1,2,2,1,1,2,1),c=c(1,1,2,1,2,2,1))
+x
+table(x) #只给了一个参数x，且x是一个dataframe，所以table中默认a列作为行，b列作为列,c列作为层,形成了list#
+dfx <- as.data.frame(table(x))
+xtabs(Freq~a+b+c,data=dfx)
+#以上5行，展示xtabs函数与table函数的效果，Freq在~左边，表示相应于右边的变量值的计数向量。总体效果和EXCEL的数据透视表一样，a列作为行，b列作为列,c列作为层#
+
+## 8.2 汇总路线图
+###########################
+#面对数据汇总问题，需要思考3点
+#1.数据是怎么分组的？
+#2.要操作的数据有什么性质？
+#3.所需的最终结果是什么？
+###########################
+#1.所需最终结果的分组，已经在初始list中，用"sapply"或"lapply"，用split函数配合，分别返回"降维后的向量/数值"或"list"
+#2.所需最终结果的分组，在初始的一个matrix中待提取尚未成型，用"apply"，返回"向量/数值"；若对行/列操作的结果维度不同，将返回list
+#3.基于一个或多个分组变量的分组（聚合阵列格式输出），用"aggregate"函数，返回dataframe；
+#3.1若计算需一次访问一个或多个单一向量（交叉表格式输出），用"tapply"，可返回"向量/数值"，
+#3.2若计算需一次访问一个或多个单一向量，用"by"可一次性批量完成多个tapply的重复动作，返回"list"
+
+## 8.3 将函数映射到向量或列表(sapply、lapply、split)
+text <- c('R is a free environment for statistical analysis',
+          'It complies and runs on a variety of platforms',
+          'Visit the R home page for more information')
+result <- strsplit(text,' ')
+result
+length(result)
+nwords <- sapply(result,length)
+nwords
+#以上8行，展示初始list使用sapply/lapply一次性得到每层word词语的个数，因为是一模一样的标量所以sapply比lapply更合适#
+nchars <- lapply(result,nchar)
+nchars
+#以上2行，展示nchar得到字母character的个数#
+
+tail(ChickWeight)
+class(ChickWeight)
+sapply(ChickWeight,class)
+#以上3行，展示sapply应用于数据框，但由于数据框本身chick列中类class长度与其他3列不一致，所以返回的是list，而不是向量vector#
+
+df
+df[,sapply(df,class) == 'numeric']
+#以上2行，展示从原df数据框筛选出数值型变量的列，形成一个新的数据框#
+
+maxcor <- function(i,n=10,m=5){
+  mat = matrix(rnorm(n*m),n,m)  
+  corr= cor(mat)
+  diag(corr)=NA
+  max(corr,na.rm = TRUE)
+}
+maxcors <- sapply(1:1000,maxcor,n=100)
+mean(maxcors)
+#以上8行，展示用sapply做循环，计算生成1000个随机数矩阵，并确定矩阵中相关系数最高的变量#
+
+t.test(rnorm(10),rnorm(10))$statistic
+tsim <- replicate(10000,t.test(rnorm(10),rnorm(10))$statistic)
+quantile(tsim,c(0.5,0.75,0.9,0.95,0.99))
+#以上3行，展示用replicate函数，模拟sapply的过程#
+
+## 8.4 将函数映射到矩阵或数组（apply）
+head(state.x77)
+class(state.x77)
+names(state.x77)
+state.x77[,2] #以上4行，说明state.x77是matrix不是dataframe，所以用[]，不用$
+apply(state.x77,2,median)
+apply(state.x77,2,mad) #mad指绝对中位数https://d.cosx.org/d/101087-101087
+#以上6行，展示apply函数在矩阵中做隐性循环，1代表“行运算”，2代表“列运算”#
+sstate <- scale(state.x77,center=apply(state.x77,2,median),scale = apply(state.x77,2,mad))
+sstate
+#以上2行，scale函数减去每一列的均值，除以标准差，生成一个z值矩阵。
+#center参数为标准化计算提供算术平均差向量，scale参数为中心化计算提供中位数向量
+
+summfn = function(x)c(n=sum(!is.na(x)),mean=mean(x),sd=sd(x))
+#以上1行，编写一个函数，包含矩阵中非缺失观测数目，每一列的均值、每一列的标准差
+x <- apply(state.x77,2,summfn)
+x
+t(x)
+#以上4行，展示apply隐性循环的速度，一次性可多个循环，并添加合适标签
+
+x<- 1:12
+x<- matrix(x,ncol = 3,byrow = TRUE)
+apply(x,1,sum)
+#以上3行，展示apply一次性处理每3个相邻值的总和时，先将向量转为矩阵，再求每一行的sum
+
+head(USJudgeRatings)
+class(USJudgeRatings)
+mns <- colMeans(USJudgeRatings)
+mns
+#以上4行，展示colmeans函数直接将matrix或dataframe汇算均数，效率高于APPLY函数#
+
+USJudgeRatings>=8
+rowSums(USJudgeRatings>=8)
+#以上2行，展示先各列列出>=8逻辑值T和F的个数，再rowSums函数汇总#
+
+head(state.x77)
+class(state.x77)
+maxes <- apply(state.x77,2,max)
+swept <- sweep(state.x77,2,maxes,"/")
+swept
+#以上5行，展示sweep函数的最大优势，可以进行所有运算而不用提前写function，更类似于格式刷#
+
+meds <- apply(state.x77,2,median)
+meanmed <- function(var,med)mean(var[var>med])
+meanmed(state.x77[,1],meds[1])
+meanmed(state.x77[,2],meds[2])
+#以上4行，展示用apply函数写function，只用大于中位数的值计算均值
+sweep(state.x77,2,meds,meanmed)
+#以上1行，展示sweep是不能处理2次嵌套的筛选的,不用mapply必须用if来每一行i计数循环完成
+mapply(meanmed,as.data.frame(state.x77),meds)
+#以上1行，展示用mapply函数才能正确批处理,mapply是sapply的多变量版本
+mapply(meanmed,as.data.frame(state.x77),meds,SIMPLIFY = FALSE)
+#以上1行，展示SIMPLIFY参数控制mapply返回的是vector还是list
+
+## 8.5 基于组的函数映射
+head(iris)
+attributes(iris)
+aggregate(iris[-5],iris[5],mean)
+#以上3行，展示aggregate函数先group分组再mean的过程，注意1.原数据集必须删除这一列，2.第2个参数必须是list不能是vector#
+aggregate(iris[,-5],as.data.frame(iris[,5]),mean)
+#以上1行，展示第2个参数必须是list不能是vector，注意返回的都是list#
+
+head(ChickWeight)
+attributes(ChickWeight)
+class(ChickWeight)
+cweights <- aggregate(ChickWeight$weight,ChickWeight[c('Time','Diet')],mean)
+cweights
+#以上5行，展示直接分为两层进行汇算21*4的阵列分组展示#
+aggregate(ChickWeight$weight,list(Time=ChickWeight$Time,Diet=ChickWeight$Diet),mean)
+#以上1行，人工构造的list也可以达到相同的效果，汇算21*4的阵列分组展示
+
+head(PlantGrowth)
+attributes(PlantGrowth)
+maxweight1 <- tapply(PlantGrowth$weight,PlantGrowth$group,max)
+maxweight1
+class(maxweight1)
+
+maxweight2<-aggregate(PlantGrowth$weight,as.data.frame(PlantGrowth$group),max)
+maxweight2
+class(maxweight2)
+#以上9行，展示tapply处理一个变量的多个level,可返回数组array,这不同于aggregate返回list
+as.data.frame(as.table(maxweight1))
+#以上1行，展示array先转换为table表再转为dataframe得到与aggregate相同的效果
+as.data.frame.table(as.table(maxweight1),responseName = 'MaxWeight')
+
+ranges1 <- tapply(PlantGrowth$weight,PlantGrowth$group,range)
+ranges1
+ranges1[[1]]
+ranges1[['trt1']]
+ranges2<-aggregate(PlantGrowth$weight,as.data.frame(PlantGrowth$group),range)
+ranges2
+ranges2$x
+#以上4行，展示tapply不限定返回标量，可以不等长,且是向量；
+#aggregate返回值必须等长，不是向量，无法成组访问#
+
+ranges3 <- data.frame(group=dimnames(ranges1)[[1]],matrix(unlist(ranges1),ncol=2,byrow = TRUE))
+ranges3
+ranges3$X1
+#以上3行，展示tapply后转换为dataframe即可被成组访问，注意不用cbind是怕数值被转为字符#
+
+head(CO2)
+attributes(CO2)
+ranges4 <- tapply(CO2$uptake,CO2[c('Type','Treatment')],range)
+ranges4
+ranges5<-aggregate(CO2$uptake,CO2[c('Type','Treatment')],range)
+ranges5
+#以上6行，展示tapply傻瓜式返回交叉表，因为不知道该怎么放数值的位置，所以干脆压缩了导致人看不懂#
+#aggregate因为返回聚合表，反而容易让人理解#
+
+ranges4[['Quebec','chilled']]
+data.frame(expand.grid(dimnames(ranges4)),matrix(unlist(ranges4),byrow=TRUE,ncol=2))
+#以上2行，展示虽然tapply出来的傻瓜表人看不懂，但一样可以访问具体数值
+#要返回和aggregate一样，就需要做dataframe转换，expand.grid函数省资源得到cbind和rbind的表
+
+meds <- tapply(CO2$uptake,CO2[c('Type','Treatment')],median)
+meds
+meds[3] #先计算交叉条件下的中位数，相当于2个if条件下的中位数#
+inds <- tapply(CO2$uptake,CO2[c('Type','Treatment')])
+inds #再tapply但不引入参数，得到所有索引位置#
+adj.uptakes <- CO2$uptake-meds[inds]
+adj.uptakes #最后索引位置批量带入公式，批量得到具体各个值#
+#以上7行，展示tapply来完成了其他语言if条件下的具体值计算过程#
+
+CO2$uptake-ave(CO2$uptake,CO2[c('Type','Treatment')],FUN=median)
+#以上1行，展示ave函数一次性完成tapply分两步完成的过程,因为tapply是交叉表汇算过程，ave直接将其返回原索引位置
+CO2$uptake-ave(CO2$uptake,CO2$Type,CO2$Treatment,FUN=median)
+#以上1行，展示ave函数的本质是先CO2$Type和CO2$Treatment交叉计算出CO2$uptake的FUN结果，再返回原索引位置#
+
+head(iris)
+attributes(iris)
+frames <- split(iris[-5],iris[5]) ##split和do.call功能相反
+frames #以上4行，展示先用split函数将数据分组为list显示
+maxeig <- function(df)eigen(cor(df))$val[1] #以上1行，定义一个函数FUN
+sapply(frames,maxeig)
+#以上6行，展示在处理不止一个向量时，使用split函数先分组，再编写函数由SAPPLY统一处理#
+sapply(split(iris[-5],iris[5]),function(df)eigen(cor(df))$val[1])
+#以上1行，展示将上面6行浓缩到一行内写，但没有实际优势,#split和do.call功能相反
+
+tapply(1:nrow(iris),iris['Species'],function(ind,data)eigen(cor(data[ind,-5]))$val[1],data=iris)
+#以上1行，展示用tapply的行索引号方案来实现相同的效果。我现在理解不了这个过程，不如sapply好理解。
+
+max.e <- by(iris,iris$Species,function(df)eigen(cor(df[-5]))$val[1])
+max.e
+#以上2行，展示by函数实现上述的过程，这个比tapply好理解#
+as.data.frame(as.table(max.e))
+#以上1行，由于展示by函数返回的是标量，所以可以as.table和as.data.frame后转换回数据框#
+
+head(CO2)
+sumfun <- function(x)data.frame(n=length(x$uptake),
+                                mean=mean(x$uptake),
+                                sd=sd(x$uptake))
+bb <- by(CO2,CO2[c('Type','Treatment')],sumfun)
+bb
+#以上6行，展示by函数编写FUN后，一次性返回相同分组的n、mean和sd值
+do.call(rbind,bb) #先整合值,#split和do.call功能相反
+cbind(expand.grid(dimnames(bb)),do.call(rbind,bb)) #再添加分组水平名称
+#以上2行，展示by后在返回数据框的过程中，用do.call函数批量完成rbind输出动作
+
+## 8.6 reshape包
+head(state.x77)
+state.region
+attributes(state.x77)
+class(state.x77)
+states <- data.frame(state.x77,state=row.names(state.x77),
+                     region=state.region,row.names = 1:50)
+states
+attributes(states)
+library(reshape)
+mstates <- melt(states)
+mstates
+#以上11行，展示将两个数据集（matrix和因子向量）合并成states数据框，
+#再将state，region做为id.var编号变量melt整个数据框#
+
+library(reshape)
+mstates2 <- melt(states,id.vars = "region")
+tail(mstates2)
+#以上3行，展示指定编号变量的情况下，其他都是measure.var测量变量#
+
+library(reshape)
+mstates3 <- melt(states,id.vars = "region",variable_name = "test1")
+tail(mstates3)
+#以上3行，展示variable_name参数改测量变量的名称#
+
+cast(mstates,region~variable)
+#以上1行，展示cast函数默认返回length值
+cast(mstates,region~variable,mean)
+#以上1行，展示cast函数返回以region作为组别的variable的均值，与EXCEL的数据透视表相同效果
+cast(mstates,...~variable)
+#以上1行，展示...三个点表示在公示中没有展示的所有变量的一次性与variable的关系，结果相当于恢复了原数据集#
+
+cast(mstates,variable~region,mean)
+#以上1行，展示cast函数作为EXCEL数据透视表一样的效果
+
+cast(mstates,region~variable,mean,subset = variable %in% c('Population','Life.Exp'))
+#以上1行，展示cast数据透视表中，使用subset参数筛选仅用Population和Life.Exp#
+
+cast(mstates,.~variable,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp'))
+#以上1行，展示.一个点代表整体一次性求出均值，中位数，标准差，仅要'Population','Life.Exp'的#
+
+cast(mstates,...~variable,c(mean,median),subset = variable %in% c('Population','Life.Exp'))
+#以上1行，展示...三个点剩余所有变量，一次性求均值，中位数，仅要'Population','Life.Exp'的#
+
+cast(mstates,variable~.,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp'))
+t(cast(mstates,.~variable,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp')))
+#以上2行，显示出来的区别体会一下#
+
+cast(mstates,region~variable,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp'))
+cast(mstates,variable~region,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp'))
+cast(mstates,variable~.|region,c(mean,median,sd),subset = variable %in% c('Population','Life.Exp'))
+#以上3行，展示颠倒位置后通过variable~.进行计算，再通过|region让系统识别分组，知道分成list展示
+
+head(ChickWeight)
+attributes(ChickWeight)
+mChick <- melt(ChickWeight,measure.vars = 'weight')
+mChick
+#以上3行，展示准备熔chickweight数据集，但因为time是数值型存储，所以必须指定测量变量#
+
+cast(mChick,Diet+Time~variable,median)
+#以上1行，展示数据透视表Diet+Time求测量变量的中位数#
+
+cast(mChick,Diet~Time+variable,mean)
+#以上1行，展示将id.var中的TIME调整到列显示的方法#
+
+cast(mChick,Time~variable|Diet,mean)
+#以上1行，展示Diet分层展示数据透视表#
+
+xChickWeight <- subset(ChickWeight,!(Diet ==1 & Time==4)) #以上1行，使用subset将Diet==1 & Time==4的数据删除了
+mxChick <- melt(xChickWeight,measure.vars = 'weight')
+head(cast(mxChick,Diet+Time~variable,median))
+head(cast(mxChick,Diet+Time~variable,median,add.missing = TRUE))
+#以上4行，展示add.missing参数让NA值的组合展示出来#
+
+recast(xChickWeight,measure.var = 'weight',Diet+Time~variable,median,add.missing=TRUE)
+#以上1行，展示recast函数一次完成melt和cast两个动作#
+
+## 8.7 R中的循环
+Sys.setenv(LANGUAGE = 'en') #以上1行，先要设置R系统语言为en
+dat <- matrix(rnorm(100000000),1000000,100)
+system.time(mns <- rowMeans(dat))
+system.time(mns <- apply(dat,2,mean))
+system.time({mn <- rep(NA,100)
+m <- ncol(dat)
+for (i in 1:m){mn[i]<- mean(dat[,i])}})
+#以上7行，展示system.time函数测量一个循环的3种不同表达式各自需要占用的资源数#
+slowmean <- function(dat){
+  n <- dim(dat)[1]
+  m <- dim(dat)[2]
+  mns <- numeric(m)
+  for(i in 1:n){
+    sum=0  
+    for(j in 1:m)sum = sum +dat[j]
+    mns[j] = sum / n
+  }
+  return(mns)
+}
+system.time(mns <- slowmean(dat))
+#以上12行，展示system.time函数测量一个循环完全不使用向量的方法，最占用的资源数#
+system.time({m = dim(dat)[1];mns <- rep(1,m) %*% dat / m })
+#以上1行，展示5种方法中第2快的计算矩阵均值的方式#
+
+system.time(m <- matrix(1:100,10000,100,byrow=TRUE))
+
+buildrow <- function(){
+  res = NULL
+  for (i in 1:10000){res = rbind(res,1:100)}
+  res
+}
+system.time(buildrow())
+#以上8行，展示向量化和纯循环计算的速度差异，内存分配问题#
+
+buildcol <- function(){
+  res = NULL
+  for (i in 1:10000){res = cbind(res,1:100)}
+  t(res)
+}
+system.time(buildcol())
+#以上6行，展示纯循环时扩展列而不是行，速度快一倍，原因是R内部按照列存储矩阵，内存分配不用进进出出
+
+buildrow1 <- function(){
+  res = matrix(0,10000,100)
+  for (i in 1:10000){res[i,] = 1:100}
+  res
+}
+system.time(buildrow1())
+#以上6行，展示循环慢的原因：一开始没有分配结果矩阵的大小，所以R内部矩阵在不断扩大占用了资源#
+
+somerow1 <- function(){
+  res <- NULL
+  for (i in 1:10000){if(runif(1) < .5){res <- rbind(res,1:100)}}
+  res
+}
+system.time(somerow1())
+
+somerow2 <- function(){
+  res <- matrix(0,10000,100)
+  k = 0
+  for(i in 1:10000){if(runif(1) < .5){
+    k = k + 1
+    res[k,] <- 1:100
+  }
+    res[1:k]
+  }
+}
+system.time(somerow2())
+#以上18行，展示根本原因：内存分配大小要首先确定，即使浪费也没有关系，可以极有效提高效率#
+
+somerow3 <- function(){
+  res <- list()
+  for(i in 1:10000)if(runif(1)< .5)res <- c(res,list(1:100))
+  do.call(rbind,res) #split和do.call功能相反
+}
+system.time(somerow3())
+#以上7行，展示即使估算不出内存需要多大的解决方案：先做成list，再do.call批量合并，效率也远高于重复分配内存#
+
+# 第9章 重塑数据
+## 9.1 修改数据框中的变量
+head(Loblolly)
+attributes(Loblolly)
+Loblolly$logheight <- log(Loblolly$height)
+Loblolly["logheight"] <- log(Loblolly["height"])
+#以上2行，干了同一件事：在dataframe中新建1列logheight#
+
+with(Loblolly,log(height))
+#以上1行，展示with函数不用重复输入数据框名称而计算出log(height)的值，注意没有写入到数据框中
+
+Loblolly <- transform(Loblolly,test = log(height))
+Loblolly
+#以上1行，展示transform函数往现有数据框中添加新列test
+
+subset(Loblolly,select = -c(test))
+#以上1行，展示subset函数删除1列#
+
+head(iris)
+attributes(iris)
+iris[,-5] <- sapply(iris[,-5],function(x)x/2.54)
+#以上3行，展示sapply一次性将iris前4列单位从里面转为英寸，和do.call效果类似#
+
+head(iris)
+rm(iris)
+head(iris)
+#以上3行，展示iris是系统内置数据框，所以不会被改变，改的是本地iris数据框#
+
+## 9.2 变量的重新编码
+bigsepal <- iris$Sepal.Length>6
+bigsepal
+#以上2行，直接将花直径大于6的赋值到bigsepal，分成T和F两组#
+
+sepalgroup <- 1 + (iris$Sepal.Length>=5) + (iris$Sepal.Length>=7)
+sepalgroup
+#以上2行，直接将花直径0-5,5-7，>=7分了三组分别赋值1,2,3#
+sepalgroup <- cut(iris$Sepal.Length,c(0,5,7,10),include.lowest = TRUE,right=FALSE)
+sepalgroup
+#以上2行，cut函数也是将花直径0-5,5-7，>=7分了三组，前闭后开#
+
+group <- c(1,2,3,4,5)
+newgroup <- ifelse(group %in% c(1,5),1,2)
+newgroup
+#以上3行，展示ifelse进行元素级别的变量重新替换编码，分了2组
+#注意：ifelse如果yes或no后返回的是向量而不是标量，将在第一个元素执行后截断，但是可以嵌套
+
+group <- c(1,2,3,4,5)
+newgroup <- ifelse(group %in% c(1,5),1,
+                   ifelse(group %in% c(2,4),2,3)
+)
+newgroup
+#以上5行，展示ifelse的嵌套分了3组#
+
+x <- c(-1.2,-3.5,-2.8,-1.1,-0.7)
+newx <- ifelse(x>0,log(x),abs(x))
+newx
+
+x <- c(-1.2,-3.5,-2.8,1.1,-0.7)
+newx <- ifelse(x>0,log(x),abs(x))
+newx
+#以上7行，展示ifelse的warning，说明在ifelse内部先是yes和no的值都算出来，然后再筛选显示#
+
+x <- c(-1.2,-3.5,-2.8,1.1,-0.7)
+newx <- numeric(length(x)) #先复制分配内存#
+newx[x>0] = log(x[x>0])
+newx[x<=0] = abs(x[x<=0])
+newx
+#以上5行，展示为避免ifelse的warning的写法
+newx <- sapply(x,function(t)if(t>0)log(t) else abs(t))
+newx
+#以上2行，展示sapply和if/else结合使用避免ifelse的warning问题
+
+## 9.3 recode函数
+library(car)
+group <- c(1,2,3,4,5)
+newgroup <- recode(group,'c(1,5)=1;c(2,4)=2;else=3') #注意必须用=，不能用<-#
+newgroup
+#以上4行，展示recode函数的重新编码#
+
+library(car)
+group <- c(2,1,3,4,7,5,6)
+newgroup2 <- recode(group,"lo:3='middle';c(2,4)=2;6:hi='high';else='not found'") #注意'和"的嵌套问题
+newgroup2
+library(car)
+group <- c(2,1,3,4,7,5,6)
+newgroup2 <- recode(group,"c(2,4)=2;lo:3='middle';6:hi='high';else='not found'") #注意'和"的嵌套问题
+newgroup2
+#以上8行，展示recode函数的工作原理：先将向量排序，再赋值新字符，且"2"这个值是依序往后重新编码的,lo代表最小值，hi代表最大值#
+
+## 9.4 重塑数据
+mydata <- data.frame(grp1=c(12,15,19,22,25),
+                     grp2=c(18,12,42,29,44),
+                     grp3=c(8,17,22,19,31)
+)
+mydata
+sdata <- stack(mydata)
+head(sdata)
+#以上7行，展示stack函数将分组数据的数据恢复成可被方差分析或画直方图的堆栈型式#
+
+sdata <- stack(mydata,select = 1:2)
+sdata
+sdata <- stack(mydata,select = c(1,3))
+sdata
+#以上4行，展示stack函数的select参数发挥与subset相同的作用，选取需要推栈的变量#
+
+mydata <- unstack(sdata,values~ind)
+mydata
+#以上2行，展示unstack函数解除堆栈型式#
+
+set.seed(17)
+obs <- data.frame(subj=rep(1:4,rep(3,4)),
+                  time=rep(1:3),
+                  x=rnorm(12),y=rnorm(12)
+)
+obs
+
+wideobs <- reshape(obs[c(1:4,6:11),],idvar = 'subj',v.names = c('x','y'),timevar = 'time',direction = 'wide')
+wideobs
+#以上9行，展示reshape函数利用5个必备参数，转为重复测量的宽形数据框，idvar参数提供锚，v.names参数指定重复测量的变量，
+#timevar参数确定序列号，direction确定是长形long还是宽形wide数据框#
+
+wideobs2 <- reshape(obs[c(1:4,6:11),],idvar = 'subj',v.names = c('x'),timevar = 'time',direction = 'wide')
+wideobs2
+#以上2行，展示因y未被纳入v.names进行测量计数，仅第一个值被视为常数处理，且有warning#
+wideobs3 <- reshape(obs[c(1:4,6:11),],idvar = 'subj',v.names = c('x'),timevar = 'time',direction = 'wide',drop=c('y'))
+wideobs3
+#以上2行，展示drop参数将不纳入v.names的y变量忽略，保证转为宽形数据框时不出现warning#
+
+attributes(wideobs)
+obs <- reshape(wideobs) 
+obs
+#以上3行，展示被reshape函数转换过的数据框，其整个过程被存储在数据attributes中，再跑一遍reshape就可以恢复原格式#
+
+data("USPersonalExpenditure")
+head(USPersonalExpenditure)
+attributes(USPersonalExpenditure)
+usp <- data.frame(type=rownames(USPersonalExpenditure),USPersonalExpenditure,row.names = NULL)
+usp #因原数据类型为matrix存储，所以第1步是转为数据框形式存储#
+rr <- reshape(usp,varying=list(names(usp)[-1]),direction='long')
+rr
+#以上7行，展示reshape函数将矩阵数据集先转为数据框，再转为long长型数据框#
+#varying参数先认定到哪些变量是要转为长型数据框的，注意要存为list才可被识别#
+rr2 <- reshape(usp,varying=list(names(usp)[-1]),direction='long',idvar='type')
+rr2
+#以上2行，展示idvar参数可以抑制id变量自动生成,转为结合idvar和times生成#
+rr <- reshape(usp,varying=list(names(usp)[-1]),idvar='type',
+              times=seq(1940,1960,by=5),v.names='expend',direction='long')
+rr
+names(rr)
+rownames(rr)
+#以上3行，展示结合idvar和times参数生成新的自动行名，v.names参数改重复行的列名#
+
+#注意当联合使用varying和split参数时，varying参数应该是向量不是list#
+names(usp)[-1]
+rr1 <- reshape(usp,varying=names(usp)[-1],split=list(regexp='X1',include=TRUE),
+               idvar='type',direction='long')#split和do.call功能相反
+rr1
+#以上4行，展示了不提供明确时间值，重塑到长型数据框的另一种方法#
+#通过split拆分varying的names，1.正则表达式将第1个字符X提取作为变量的列名，
+#2.剩余部分传递给time重复使用#
+
+names(usp)[-1]
+rr3 <- reshape(usp,varying=names(usp)[-1],split=list(regexp='X1',include=TRUE),
+               idvar='type',direction='long',new.row.names = 1:1000,
+               timevar = "YEAR")
+rr3
+#以上4行，展示new.row.names进行row的改名，注意不能有重复行名#
+#timevar改time计数列的列名，注意：v.names不能和split同时使用#
+
+## 9.5 reshape包
+library(reshape)
+usp <- data.frame(type=rownames(USPersonalExpenditure),
+                  USPersonalExpenditure,row.names = NULL
+)
+musp <- melt(usp)
+musp
+#以上6行，展示melt过程实质是宽型数据到长型数据的过程#
+musp$variable <- as.numeric(sub(pattern = "X",replacement = "",x=musp$variable))
+names(musp)[2:3]<- c('year','expend')
+head(musp)
+#以上3行，展示melt后利用sub替换掉X再转成数值型，再重命名#
+cast(musp,year + type ~ .)
+#以上1行，展示cast投射成新数据框#
+
+set.seed(17)
+obs <- data.frame(subj=rep(1:4,rep(3,4)),
+                  time=rep(1:3),
+                  x=rnorm(12),y=rnorm(12)
+)
+obs
+library(reshape)
+mobs <- melt(obs,id.vars = c('subj','time'))
+cast(subj ~ variable+time,data=mobs)
+#以上9行，展示cast函数将long转wide数据框，variable+time形成派生列名称#
+
+library(reshape)
+mobs <- melt(obs,id.vars = c('subj','time'))
+cast(subj~variable|time,data = mobs)
+#以上3行，展示用竖线|分离成list展示数据，效果与split函数相同#
+
+library(reshape)
+mobs <- melt(obs,id.vars = c('subj','time'))
+cast(subj ~ variable + time,subset = variable == 'x',data = mobs)
+#以上3行，展示用subset参数仅x不要y形成wide数据框#
+
+## 9.6 合并数据框
+x <- data.frame(a=c('A','B','C'),x=c(12,15,19),stringsAsFactors = TRUE )
+y <- data.frame(a=c('D','E','F','G'),x=c(19,21,14,12))
+x
+y
+cbind(y,z=c(1,2))
+#以上5行，展示cbind函数的向量若正好是数据框或matrix的整数倍，会自动循环填充#
+
+cbind(x,y[1:3,])
+#以上1行，展示cbind不会发现重复的列名#
+
+intersect(names(x),names(y))
+#以上1行，展示intersect函数对比出x列名向量与y列名向量之间的重叠内容#
+#intersect函数相当于向量层面的innerjoin#
+
+z <- rbind(x,c(a='X',x=12))
+#以上1行，展示rbind加行时，列的单元格属性要与旧的一致，此处因子类型与文本类型不一致所以警告#
+z <- rbind(x,data.frame(a='X',x=12,stringsAsFactors = TRUE ))
+z
+levels(z$a)
+#以上3行，展示rbind时不出现warning的正确写法#
+
+#########################################
+#merge函数所有表现均为natural join下的innerjoin、leftjoin和rightjoin
+#intersect表现是SQL意义的innerjoin
+#R通过%in%表现SQL层面的leftjoin和rightjoin
+#########################################
+x <- data.frame(a=c(1,2,4,5,6),x=c(9,12,14,21,8))
+y <- data.frame(a=c(1,3,4,6),y=c(8,14,19,2))
+x
+y
+merge(x,y)
+#以上5行，展示merge函数不加任何参数=x和y的交集natural join#
+merge(x,y,by='a')
+merge(x,y,by.x='a',by.y='a') #若列名称不同
+#以上2行，与以上效果相同#
+#印象笔记中有交集、并集等详细图示
+#https://app.yinxiang.com/shard/s37/nl/7395870/b7d3e078-90a7-4ff4-8193-ad0e8c84760d
+
+merge(x,y,all=TRUE)
+#以上1行，展示fulljoin全输出并集
+merge(x,y,all.x=TRUE)
+#以上1行，展示leftjoin
+merge(x,y,all.y=TRUE)
+#以上1行，展示rightjoin
+
+cities <- data.frame(city=c('New York','Boston','Juneau','Anchorage','San Diego',
+                            'Philadelphia','Los Angeles','Fairbanks','Ann Arbor',
+                            'Seattle'),
+                     state.abb=c('NY','MA','AK','AK','CA','PA','CA','AK','MI','WA') 
+)
+cities
+states <- data.frame(state.abb=c('NY','MA','AK','CA','PA','MI','WA'), 
+                     state=c('New York','Massachusetts','Alaska','California',
+                             'Pennsylvania','Michigan','Washington')
+)
+states
+merge(cities,states)
+merge(states,cities)
+#以上13行展示，有多行共同值时，左右合并都一样，会自动每行输出一个观测#
+
+cities <- data.frame(city=c('New York','Boston','Juneau','Anchorage','San Diego',
+                            'Philadelphia','Los Angeles','Fairbanks','Ann Arbor',
+                            'Seattle'),
+                     state.abb=c('NY','MA','AK','AK','CA','PA','CA','AK','MI','WA') 
+)
+cities
+zips <- data.frame(state.abb=c('NY','MA','AK','AK','CA','PA','CA','AK','MI','WA'),
+                   zip=c('10044','02129','99801','99516','92113',
+                         '19127','90012','99709','48104','98104')
+)
+zips
+merge(cities,zips)
+cbind(cities,zips)
+#以上12行，展示merge的错误使用，因state.abb不唯一，merge只能创建多个观测
+#cbind可以勉强用，也会有遗留问题（顺序）#
+
+## 9.7 在merge的环境下
+match(cities$state.abb,states$state.abb)
+match(states$state.abb,cities$state.abb)
+#以上2行，展示match函数返回位置索引值，
+#且1.永远返回与第一向量等长的值2.返回第一个出现的匹配索引值#
+
+x <- data.frame(a=c(1,2,4,5,6),x=c(9,12,14,21,8))
+y <- data.frame(a=c(1,3,4,6),y=c(8,14,19,2))
+x
+y
+indices <- match(x$a,y$a)
+indices
+y$a[indices]
+indices2 <- match(x$a,y$a,nomatch=0)
+y$a[indices2]
+intersect(x$a,y$a)
+#以上10行，展示nomatch参数默认为NA，设置为0时，可产生与intersect相同的效果
+
+x$a %in% y$a
+#以上1行，展示%in%函数从y中找出x的情况，长度与x相同#
+###########################################################################
+###########################################################################
+##########################################################
+#
+#shiny官方教程
+#RStudio 著
+#
+#庞成批注：shiny包的使用说明书。R语言交互界面的制作shiny包、 shinydashboard和flexdashboard包
+##########################################################
+install.packages('shiny')
+
+#shiny包官方教程
+# https://wenku.baidu.com/view/9aa408ed4bfe04a1b0717fd5360cba1aa8118cbb.html
+#将shiny app部署到公网云服务器上
+# https://my.oschina.net/u/4503882/blog/4409518
+
+
+
+
+###########################################################################
+
+##########################################################
+#
+#R语言实战（第2版）R in Action: Data Analysis and Graphics with R (Second Edition)
+#Robert I. Kabacoff 著
+#ISBN 978-7-115-42057-2
+#庞成批注：这本书是查漏补缺用的工具书
+##########################################################
+# 第1章 R语言介绍
+## 1.1 为何要使用R
+#                         明确目标
+#                             |
+#                         需求梳理
+#                             |
+#                         导入数据（数据采集）
+#                             |
+#           |---------->数据准备，探索和清理（数据流构建）
+#           |                 |
+#           |             业务分析（6大分析法：相关性分析法、分布分析法、对比分析法、多维分析法、交叉分析法、时间序列分析法）
+#           |                 |
+#           |             指标体系搭建与关键指标抽取
+#           |                 |
+#           |---------->拟合一个统计模型（模型选择）<-----|
+#           |                 |                           |
+#         评估模型拟合结果<---|                           |
+#                             |                           |
+#                             |------------------>模型的交叉验证
+#                             |
+#                   在数据上评估模型预测效果
+#                             |
+#                         形成报告
+#
+######### 图1-1 典型的数据分析步骤 最为重要！###############
+############################################################
+
+## 1.2 R的获取和安装
+## 1.3 R的使用
+###1.3.1 新手上路
+age <- c(1,3,5,2,11,9,3,9,12,3)
+weight <- c(4.4,5.3,7.2,5.2,8.5,7.3,6.0,10.4,10.2,6.1)
+mean(weight)
+sd(weight)
+cor(age, weight)
+plot(age, weight)
+#以上6行，完成月龄和体重的数据输入、平均值、标准差、相关度计算，最后画图
+
+demo(graphics)
+demo(persp)
+demo(Hershey)
+demo(image)
+#以上4行，展示demo函数查阅R语言大概能作出何种图形#
+
+### 1.3.2 获取帮助
+
+
+
+
+mydata <- data.frame(年龄=numeric(0),gender=character(0),体重=numeric(0))
+mydata <- edit(mydata)
+mydata
+
+mydata <- edit(mydata) #再次调用这一行，可继续前面的修改
+fix(mydata)
+#以上2行效果等价，展示fix函数继续修改的功能#
+
+
+##########################################################
+#
+#时间序列分析及应用R语言（原书第2版）Time Series Analysis with Applications in R (Second Edition)
+#Jonathan D. Cryer 著
+#ISBN 978-7-111-32572-7
+#庞成批注：这本书是TSA包使用说明
+##########################################################
+# 第1章 引论
+## 1.1 时间序列举例
+install.packages("TSA")
+library("TSA")
+data(larain);attributes(larain)
+win.graph(width=4.875,height=2.5,pointsize = 8)
+plot(larain,ylab='Inches',xlab='Year',type='h')
+#以上5行，展示下载并载入TSA时间序列分析包；读取larain数据集；并画图
+#其中data(larain);attributes(larain)，通过;完成换行符的功能
+#win.graph打开一个新的画图界面
+
+library("TSA")
+win.graph(width=3,height = 3,pointsize = 8)
+plot(y=larain,x=zlag(larain),ylab='Inches',xlab = 'Previous Year Inches')
+#以上2行，展示TSA分析的第一步画图进行模型识别,zlag函数1阶滞后图，与lag函数滞后年份不同#
+
+library("TSA")
+win.graph(width=4.875,height=2.5,pointsize=8)
+data(color)
+plot(color,ylab='Color Property',xlab='Batch',type='o')
+win.graph(width=3,height = 3,pointsize = 8)
+plot(y=color,x=zlag(color),ylab='Color Property',xlab = 'Previous Batch Color Property')
+#以上6行，完整展示color的TSA模型识别的过程#
+
+library("TSA")
+win.graph(width=4.875,height=2.5,pointsize=8)
+data(hare);plot(hare,ylab='Abundance',xlab='Year',type='o')
+win.graph(width=3,height = 3,pointsize = 8)
+plot(y=hare,x=zlag(hare),ylab='Abundance',xlab = 'Previous Year Abundance')
+#以上5行，完整展示hare的TSA模型识别的过程#
+
+library("TSA")
+win.graph(width=4.875,height=2.5,pointsize=8)
+data("tempdub");plot(tempdub,ylab='Temperature',xlab='Year',type='o')
+win.graph(width=3,height = 3,pointsize = 8)
+plot(y=tempdub,x=zlag(tempdub),ylab='Temperature',xlab = 'Previous Year Temperature')
+#以上5行，完整展示tempdub的TSA模型识别的过程#
+
+library("TSA")
+data("oilfilters")
+attributes(oilfilters)
+plot(oilfilters,type='o',ylab='Sales')
+
+plot(oilfilters,type='l',ylab='Sales')
+points(y=oilfilters,x=time(oilfilters),pch=as.vector(season(oilfilters)))
+#以上7行中，time函数取到年，season函数取到月份#
+
+### 第1章 练习
+Dat <- c(12,31,22,24,30)
+Dat2 <- ts(Dat,start=c(2006,2),frequency = 4)
+Dat2
+attributes(Dat2)
+#以上4行，展示建立时间序列结构的方法，ts函数下start从2006的第2个值开始赋值，频率为4
+#以上4行为特殊情况，会自动适配到季度内
+
+Dat <- c(12,31,22,24,30,6,7,8)
+Dat2 <- ts(Dat,start=c(2006,3),frequency = 6)
+Dat2
+attributes(Dat2)
+#以上4行，为非特殊情况，无法自动适配进季度或约，但是有数学意义的ts序列，
+#$tsp是起始和结束位置在数学尺度上的值
+
+Dat3 <- data.frame(Y1=c(1,3,4,5),X2=c(2,7,8,9))
+Dat3
+Y1
+attach(Dat3)
+Y1
+detach(Dat3)
+Y1
+#以上7行的作用，直接用变量名Y1而不是Dat3$Y1访问变量列
+
+
+Dat <- c(12,31,22,24,30)
+Dat2 <- ts(Dat,start=c(2006,2),frequency = 4)
+Dat2
+log(Dat2)
+#以上4行，展示log函数会依次作用于每个具体值#
+new.Dat2 <- 2*Dat2^3-Dat2+7
+new.Dat2
+#以上2行，展示运算会依次作用于每个具体值#
+
+data(color)
+plot(color,ylab='Color Property',xlab='Batch',type='o')
+plot(color,color,ylab='Color Property',xlab='Batch',type='o')
+#以上3行，体会一下color在plot中不同位置代表的意义#
+plot(as.vector(color),color,ylab='Color Property',xlab='Batch',type='o')
+#以上4行，体会一下color从TS被转为vector后，在plot中不同位置代表的意义#
+
+## 习题
+### 1.1
+data(larain)
+win.graph(width=3,height = 3,pointsize = 8)
+plot(y=larain,x=zlag(larain),ylab='英寸',xlab='上一年英寸')
+
+### 1.2
+library(TSA)
+data(color)
+win.graph(width = 4.875,height =2.5,pointsize = 8)
+plot(color,type='o',xlab='批次',ylab='颜色属性')
+
+### 1.3
+set.seed(28)
+y <- rnorm(48)
+y
+plot(y,type = 'o',ylab='IID Normal Data')
+#以上4行，展示模拟长度为48，完全随机的独立正态分布过程
+
+### 1.4
+y=rchisq(n=48,df=2)
+plot(y,type='o',ylab='IID chisq Data')
+#以上2行，展示模拟一个长度为48，完全随机，自由度为2的独立卡方分布过程
+
+### 1.5
+y=rt(n=48,df=5)
+plot(y,type='o',ylab='IID t Data')
+#以上2行，展示模拟一个长度为48，完全随机，自由度为5的独立t分布过程
+
+### 1.6
+library(TSA)
+data("tempdub")
+plot(tempdub,type='l',xlab='年份',ylab='气温')
+points(y=tempdub,x=time(tempdub),pch=as.vector(season(tempdub)) )
+
+# 第2章 基本概念
+## 2.1 时间序列与随机过程
+
+data("rwalk")
+model1<- lm(rwalk~time(rwalk))
+summary(model1)
