@@ -27,6 +27,7 @@ tags:
 - 长视频
   - YouTube
   - bilibili
+  - 优酷
 
 - 复合体  
   - 微信公众号：Online-Markdown或Md2All
