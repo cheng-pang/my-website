@@ -1,7 +1,7 @@
 ---
 title: R miscellaneous
 author: cheng pang
-date: '2021-08-30'
+date: '2021-08-28'
 slug: r-miscellaneous
 categories: []
 tags:

@@ -1,14 +1,14 @@
 {
-    "id": "0B9F2EF5",
-    "path": "D:/c/blogdown/chengpang/content/post/2021-08-28-r-miscellaneous/index.md",
-    "project_path": "content/post/2021-08-28-r-miscellaneous/index.md",
+    "id": "7F46F02C",
+    "path": "D:/c/blogdown/chengpang/content/post/2021-08-28-install-new-win10-system/index.md",
+    "project_path": "content/post/2021-08-28-install-new-win10-system/index.md",
     "type": "markdown",
-    "hash": "1659937654",
+    "hash": "2519987850",
     "contents": "",
     "dirty": false,
-    "created": 1630455034677.0,
+    "created": 1630627010553.0,
     "source_on_save": false,
-    "relative_order": 5,
+    "relative_order": 7,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
@@ -16,11 +16,11 @@
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1630455042,
+    "lastKnownWriteTime": 1630627025,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1630455042834,
+    "last_content_update": 1630627025707,
     "read_only": false,
     "read_only_alternatives": []
 }
