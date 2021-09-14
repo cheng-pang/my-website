@@ -3,7 +3,7 @@
     "path": "D:/c/blogdown/chengpang/content/post/2021-08-27-r-package-collection/index.md",
     "project_path": "content/post/2021-08-27-r-package-collection/index.md",
     "type": "markdown",
-    "hash": "0",
+    "hash": "3022663881",
     "contents": "",
     "dirty": false,
     "created": 1631492685076.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "50,10",
-        "scrollLine": "45"
+        "cursorPosition": "64,330",
+        "scrollLine": "61"
     },
     "folds": "",
-    "lastKnownWriteTime": 1631492790,
+    "lastKnownWriteTime": 1631578343,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1631492790606,
+    "last_content_update": 1631578343117,
     "read_only": false,
     "read_only_alternatives": []
 }
