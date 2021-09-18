@@ -26,6 +26,12 @@ tags:
 
 ## Visualise 可视化、画图相关
 
+- ggvis包
+  
+  - 用途：ggplot2包的升级，尤其支持 %>% 管道函数与数据交互功能
+  
+  - 详细介绍：<https://mp.weixin.qq.com/s/WMslkXFjvoJfIIpW5J3Dcg>
+
 - grafify包
 
   - 用途：快速绘制19个ggplot2图形

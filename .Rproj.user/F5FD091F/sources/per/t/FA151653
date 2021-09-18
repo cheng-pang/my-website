@@ -1,26 +1,26 @@
 {
-    "id": "45F15742",
+    "id": "FA151653",
     "path": "D:/c/blogdown/chengpang/content/post/2021-08-27-r-package-collection/index.md",
     "project_path": "content/post/2021-08-27-r-package-collection/index.md",
     "type": "markdown",
-    "hash": "3022663881",
+    "hash": "2162805888",
     "contents": "",
     "dirty": false,
-    "created": 1631492685076.0,
+    "created": 1631926310135.0,
     "source_on_save": false,
-    "relative_order": 3,
+    "relative_order": 2,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "64,330",
-        "scrollLine": "61"
+        "cursorPosition": "30,39",
+        "scrollLine": "21"
     },
     "folds": "",
-    "lastKnownWriteTime": 1631578343,
+    "lastKnownWriteTime": 1631926503,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1631578343117,
+    "last_content_update": 1631926503408,
     "read_only": false,
     "read_only_alternatives": []
 }
