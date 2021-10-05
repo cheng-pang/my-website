@@ -54,13 +54,13 @@ tags:
 
   - 用途：使用字母价值图letter value plot 或叫boxen plot，解决大数据集画箱线图boxplot数量庞大的异常值问题
   
-  - 详细介绍：https://towardsdatascience.com/letter-value-plot-the-easy-to-understand-boxplot-for-large-datasets-12d6c1279c97#:~:text=Letter%20Value%20Plot%20%E2%80%94%20The%20Easy%20to%20Understand,and%20Interpreting%20Letter-Value%20Plots.%20...%204%20Summary.%20
+  - 详细介绍：<https://towardsdatascience.com/letter-value-plot-the-easy-to-understand-boxplot-for-large-datasets-12d6c1279c97#:~:text=Letter%20Value%20Plot%20%E2%80%94%20The%20Easy%20to%20Understand,and%20Interpreting%20Letter-Value%20Plots.%20...%204%20Summary.%20>
 
 - ggbeeswarm包
 
   - 用途：和geom_jitter相似，用于观察连续变量和分类变量之间的关系
   
-  - 详细介绍：
+  - 详细介绍：<https://www.jianshu.com/p/fc527649ead4>
 
 - leaflet包
 
