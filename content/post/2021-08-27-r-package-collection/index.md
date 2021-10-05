@@ -28,7 +28,7 @@ tags:
 
 - ggstance包
 
-  - 用途：ggplot的水平翻转版本
+  - 用途：ggplot2包的水平翻转版本
   
   - 详细介绍：<https://blog.csdn.net/weixin_37737254/article/details/102920068>
   
@@ -50,6 +50,24 @@ tags:
   
   - 详细介绍：<https://mp.weixin.qq.com/s/RzhLDfHCes7tLmWo8WTFQA>
   
+- lvplot包
+
+  - 用途：使用字母价值图letter value plot 或叫boxen plot，解决大数据集画箱线图boxplot数量庞大的异常值问题
+  
+  - 详细介绍：https://towardsdatascience.com/letter-value-plot-the-easy-to-understand-boxplot-for-large-datasets-12d6c1279c97#:~:text=Letter%20Value%20Plot%20%E2%80%94%20The%20Easy%20to%20Understand,and%20Interpreting%20Letter-Value%20Plots.%20...%204%20Summary.%20
+
+- ggbeeswarm包
+
+  - 用途：和geom_jitter相似，用于观察连续变量和分类变量之间的关系
+  
+  - 详细介绍：
+
+- leaflet包
+
+  - 用途：画地图
+  
+  - 详细介绍：<https://mp.weixin.qq.com/s/d4CSp1fpjXwjWm1BSXFuIw>
+
 - ggmap包
 
 - mapview包
@@ -60,11 +78,6 @@ tags:
   
   - 详细介绍：<https://mp.weixin.qq.com/s/B85LEkO84xcNapI35Owcig>
 
-- leaflet包
-
-  - 用途：画地图
-  
-  - 详细介绍：<https://mp.weixin.qq.com/s/d4CSp1fpjXwjWm1BSXFuIw>
 
 ## Model 数据建模相关
 
