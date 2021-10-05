@@ -26,6 +26,8 @@ tags:
 
 ## Visualise 可视化、画图相关
 
+### ggplot2包的效果增强包
+
 - ggstance包
 
   - 用途：ggplot2包的水平翻转版本
@@ -50,6 +52,10 @@ tags:
   
   - 详细介绍：<https://mp.weixin.qq.com/s/RzhLDfHCes7tLmWo8WTFQA>
   
+### ggplot2包的配合用法
+
+#### 连续变量与分类变量的相关变动 Covariation
+
 - lvplot包
 
   - 用途：使用字母价值图letter value plot 或叫boxen plot，解决大数据集画箱线图boxplot数量庞大的异常值问题
@@ -61,6 +67,16 @@ tags:
   - 用途：和geom_jitter相似，用于观察连续变量和分类变量之间的关系
   
   - 详细介绍：<https://www.jianshu.com/p/fc527649ead4>
+
+#### 分类变量与分类变量的相关变动 Covariation
+
+- seriation包
+
+  - 用途：配合热图heatmaply包，实现基于不同算法的排序
+  
+  - 详细介绍：<https://www.jianshu.com/p/fc527649ead4>
+
+### 地图包与高德的用法
 
 - leaflet包
 
