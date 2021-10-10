@@ -18,9 +18,16 @@ tags:
   
   - 详细介绍：见?openxlsx说明书
   
-## Tidy 数据清洗相关
+## Tidy 数据检测和清理相关
 
 - tidyr包
+
+- janitor包
+
+  - 用途：数据检测和hurdle、barrier清理
+  
+  - 详细介绍：<https://mp.weixin.qq.com/s/0FsmjGjNWxWOEXp7biuXSw>
+
 
 ## Transform 数据转换整理相关
 
