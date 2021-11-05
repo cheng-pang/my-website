@@ -1,5 +1,5 @@
 ---
-title: "rom data tidy to data analysis"
+title: "From data tidy to data analysis"
 author: "cheng pang"
 date: '2021-11-05'
 slug: from-data-tidy-to-data-analysis
