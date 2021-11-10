@@ -25,4 +25,14 @@ tags:
 |bake      |动词      |中性      |口语、正式用语 |烘烤，一般都贴在砖边上且有成型模具| | bake a cake|
 |grill      |动词      |中性      |口语、正式用语 |明火上烤| |flame grill|
 |roast      |动词      |中性      |口语、正式用语 |隔空烤且大于30分钟，类似北京烤鸭的做法| |Peking Roast Duck |
-  
+
+- 表示[“拷贝”单词的区别](https://mp.weixin.qq.com/s?__biz=MzI4NzExMjU0Mw==&mid=2651153740&idx=1&sn=facecc4cd147deb792bd838e50bc92e6&chksm=f023697cc754e06a1b8b3c5de4fc4cfd80ce5981663321162de648a02a11328624c300a17a96&mpshare=1&scene=1&srcid=11101O7PxYqrDQQTuN4yhP5A&sharer_sharetime=1636542786870&sharer_shareid=ea4bab4dd531faf87aa87d2827adda14#rd)
+
+|单词      |词性      |褒贬义|用处      |翻译 |固定用法|Example例句|
+| ---- | ---- | ---- | ---- |----  |----  |----  |----  |
+|copy      |动词,名词      |中性      |口语、正式用语 |复制，抄袭| | |
+|copycat      |名词，形容词      |贬义      |口语、正式用语 |抄袭者，盲目模仿者| | |
+|plagiarize      |动词      |强烈贬义      |口语、正式用语 |剽窃，抄袭| | |
+|crib      |名词，动词      |中性      |口语、正式用语 |婴儿床，食槽。抄袭学校作业| | |
+|duplicate      |名词，动词，形容词      |中性      |口语、正式用语 |复制品，副本| | |  
+|replicate      |名词，动词，形容词      |中性      |口语、正式用语 |复现| | |  
