@@ -38,7 +38,7 @@ tags:
 |replicate      |名词，动词，形容词      |中性      |口语、正式用语 |复现| | |  
 
 
-- 表示[“学术不端行为academic misconduct”单词的区别](https://mp.weixin.qq.com/s?__biz=MzI4NzExMjU0Mw==&mid=2651154728&idx=1&sn=de2cd4d9be14e883c88d0e57ffd0e171&chksm=f0236518c754ec0e6917f132e9e02cf1efda8db0cdb21c183e86ec8b77db01600a718d60cbcc&mpshare=1&scene=1&srcid=11171prvWfeVm2wq7wd3RilE&sharer_sharetime=1637147444998&sharer_shareid=ea4bab4dd531faf87aa87d2827adda14#rd)
+- 表示[“学术不端行为 academic misconduct”单词的区别](https://mp.weixin.qq.com/s?__biz=MzI4NzExMjU0Mw==&mid=2651154728&idx=1&sn=de2cd4d9be14e883c88d0e57ffd0e171&chksm=f0236518c754ec0e6917f132e9e02cf1efda8db0cdb21c183e86ec8b77db01600a718d60cbcc&mpshare=1&scene=1&srcid=11171prvWfeVm2wq7wd3RilE&sharer_sharetime=1637147444998&sharer_shareid=ea4bab4dd531faf87aa87d2827adda14#rd)
 
 |单词      |词性      |褒贬义|用处      |翻译 |固定用法|Example例句|
 | ---- | ---- | ---- | ---- |----  |----  |----  |----  |
@@ -49,3 +49,7 @@ tags:
 |duplicate submission；multiple submissions      |名词      |强烈贬义      |口语、正式用语 |一稿多投| |将同一篇论文或只有微小差别的多篇论文投给两个及以上期刊，或者在约定期限内再转投其他期刊的行为 |  
 |overlapping publications      |名词，动词，形容词      |中性      |口语、正式用语 |重复发表| |在未说明的情况下重复发表自己（或自己作为作者之一）已经发表文献中内容的行为 |  
 
+- 表示[“各种颜色”单词的区别]()
+|单词      |词性      |褒贬义|用处      |翻译 |固定用法|Example例句|
+| ---- | ---- | ---- | ---- |----  |----  |----  |----  |
+|red,orange,yellow,green,blue,indigo,violet      |名词      |中性      |口语、正式用语 |彩虹七色赤橙黄绿青蓝紫|实际上violet人眼看不见，purple人眼才看得见 | |
