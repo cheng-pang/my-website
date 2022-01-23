@@ -65,3 +65,18 @@ tags:
 | ---- | ---- | ---- | ---- |----  |----  |----  |----  |
 |customer      |名词      |中性      |口语、正式用语 |随机的顾客|customer service | |
 |client      |名词      |中性      |口语、正式用语 |长期合作的客户。卖家通常是律师事务所,设计公司,咨询公司等等| | |
+
+- 表示[“兔子”单词的区别](https://mp.weixin.qq.com/s?src=11&timestamp=1642920622&ver=3575&signature=ha8eXUZfTXb8-L0t9h3BVLFX94v2Yt8tx5XtrrTea05AHtoYtzAGSOJXkHQL*ltUQoT7PuYT6MjLdNCs5nmVmumpYNT5mAKQlZCc5TDTjURSiyfcJTXjQ3-1Ra2-qVAh&new=1)
+|单词      |词性      |褒贬义|用处      |翻译 |固定用法|Example例句|
+| ---- | ---- | ---- | ---- |----  |----  |----  |----  |
+|rabbit      |名词      |中性      |口语、正式用语 |家兔，睡地洞里| | |
+|hare      |名词      |中性      |口语、正式用语 |野兔，灰色睡草窝| | |
+|bunny      |名词      |中性      |口语、正式用语 |可爱的兔子| | |
+|coney      |名词      |中性      |古法语 |兔子总称|Coney Island | |
+
+- 表示[“乌龟”单词的区别]()
+|单词      |词性      |褒贬义|用处      |翻译 |固定用法|Example例句|
+| ---- | ---- | ---- | ---- |----  |----  |----  |----  |
+|tortoise      |名词      |中性      |口语、正式用语 |陆地龟| | |
+|turtle      |名词      |中性      |口语、正式用语 |海龟，或龟类总称| | |
+|terrapin      |名词      |中性      |口语、正式用语 |鳖| | |
